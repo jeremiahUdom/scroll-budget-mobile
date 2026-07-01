@@ -33,7 +33,7 @@ const SelectApps = () => {
 
           // get all the installed apps on the user's phone
           const installedApps = await getInstalledApps()
-          setSelectedApps(prev => [...prev, ...selectedApps])
+          setSelectedApps(selectedApps)
           setApps(installedApps)
           return
         } catch (error) {
@@ -111,6 +111,7 @@ const SelectApps = () => {
         <Text style={styles.supportingText}>Pick the apps where you tend to lose time.</Text>
 
         <View style={styles.listView}>
+          <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
           { 
             initialising ? (
             <ActivityIndicator size="large" color={colors.primary} />
@@ -126,6 +127,7 @@ const SelectApps = () => {
                   />
                 )}
                 ListFooterComponent={() => (<Text style={styles.caption}>{selectedApps.length} apps chosen</Text>)}
+                ListHeaderComponent={() => (<Text style={styles.caption}>Scroll down to see all apps</Text>)}
               />
             )
           }
@@ -202,5 +204,6 @@ const styles = StyleSheet.create({
     fontSize: typography.caption,
     color: colors.darkMuted,
     fontFamily: fonts.regular,
+    marginBottom: spacing.md,
   }
 })

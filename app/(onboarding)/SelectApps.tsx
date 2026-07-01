@@ -10,11 +10,9 @@ import AppButton from '@/components/AppButton'
 import { Link, useFocusEffect, useRouter } from 'expo-router'
 import { storeSelectedAppsApi } from '@/app/api/app.api'
 import ErrorModal from '@/components/ErrorModal'
-import { SUPPORTED_APPS } from '@/constants/data/appData'
 import { setTrackedApps } from '@/utils/userPreference'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { App } from '@/types/App'
-import GoBackBtn from '@/components/GoBackBtn'
 
 const SelectApps = () => {
   const router = useRouter()
