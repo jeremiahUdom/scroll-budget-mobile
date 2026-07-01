@@ -1,0 +1,47 @@
+import { StyleSheet } from 'react-native'
+import Animated, { SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { typography } from '@/constants/typography'
+import { colors } from '@/constants/colors'
+import { ReactNode } from 'react'
+import { fonts } from '@/constants/fonts'
+
+interface Props {
+  index: number
+  currentItem: SharedValue<number>
+  children: ReactNode
+}
+
+const OnboardingText = (props: Props) => {
+  const {index, currentItem, children} = props
+  const display = useSharedValue<"flex" | "none">(index === 0 ? "flex" : "none")
+  
+  const animStyle = useAnimatedStyle(() => {
+    const isActive = currentItem.value === index
+
+    if (isActive) {
+      display.value = "flex" // show immediately before fading in
+    }
+
+    return {
+      opacity: withTiming(isActive ? 1 : 0, {duration: 800}, (finished) => {
+        if (finished && !isActive) {
+          display.value = "none" // hide only after fade-out completes
+        }
+      }),
+      display: display.value,
+    }
+  })
+  return <Animated.Text style={[styles.text, animStyle]}>{children}</Animated.Text>
+}
+
+export default OnboardingText
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: typography.body,
+    lineHeight: 24,
+    color: colors.dark,
+    position: "absolute",
+    fontFamily: fonts.regular,
+  },
+})

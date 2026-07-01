@@ -1,0 +1,338 @@
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useMemo, useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { colors } from '@/constants/colors'
+import { spacing } from '@/constants/spacing'
+import { typography } from '@/constants/typography'
+import { fonts } from '@/constants/fonts'
+import UsagePreview from '@/components/UsagePreview'
+import AppUsageCard from '@/components/AppUsageCard'
+import { useFocusEffect, Link } from 'expo-router'
+import { getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
+import PermissionModal from '@/components/PermissionModal'
+import Ionicons from '@react-native-vector-icons/ionicons'
+import { AppUsageStat } from '@/types/App'
+import { useUserPreference } from '@/context/UserPreferenceContext'
+import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
+import { sendUsageToServer } from '@/app/api/usage.api'
+import ErrorModal from '@/components/ErrorModal'
+
+const Dashboard = () => {
+  const today = new Date()
+  const {scrollBudgetInMs, myTrackedApps, loading: preferencesLoading} = useUserPreference()
+  const [usageStats, setUsageStats] = useState<AppUsageStat[]>([])
+  const [hasPermissionToViewUsageStats, setHasPermissionToViewUsageStats] = useState(false)
+  const [showPermissionModal, setShowPermissionModal] = useState(false)
+  const [loadingUsage, setLoadingUsage] = useState(true)
+  const [error, setError] = useState("")
+  const [showError, setShowError] = useState(false)
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadDashboard = async () => {
+        try {
+          setLoadingUsage(true)
+          // 1. Check if user has granted permission for the app to view usage stats
+          const permission = await hasUsagePermission()
+          setHasPermissionToViewUsageStats(permission)
+
+          if (!permission) {
+            setShowPermissionModal(true)
+            setLoadingUsage(false)
+            return
+          }
+
+          // 3. Get usage stats from Android API
+          const usageStats = (
+            await Promise.all(
+              myTrackedApps.map(async (app) => {
+                const totalTimeInForeground = (
+                  await getHourlyUsage(app.packageName)
+                ).reduce(
+                  (sum, hour) => sum + hour.durationMs,
+                  0
+                )
+
+                return {
+                  ...app,
+                  totalTimeInForeground,
+                }
+              })
+            )
+          ).sort(
+            (a, b) =>
+              b.totalTimeInForeground -
+              a.totalTimeInForeground
+          )
+
+          setUsageStats(usageStats)
+
+          // 4. Send to backend for analytics (async)
+          await sendUsageToServer(usageStats)
+        } catch (error) {
+          console.error('Dashboard load error:', error)
+          if (error instanceof Error) {
+            setError(error.message)
+            setShowError(true)
+            return
+          }
+
+          setError("An error occured while loading your dashboard. Please try again")
+          setShowError(true)
+          return
+        } finally {
+          setLoadingUsage(false)
+        }
+      }
+
+      if (!preferencesLoading) loadDashboard()
+    }, [myTrackedApps, preferencesLoading])
+  )
+
+  // Calculate total usage in milliseconds for all tracked apps
+  const totalUsageInMs = useMemo(
+    () =>
+      usageStats.reduce(
+        (sum, app) => sum + app.totalTimeInForeground,
+        0
+      ),
+    [usageStats]
+  )
+
+  const handlePermissionModalDismiss = () => {
+    setShowPermissionModal(false)
+  }
+
+  const handleOpenSettings = () => {
+    setShowPermissionModal(false)
+  }
+
+  // If both preferences and usage stats are loading, show a loading indicator
+  if (preferencesLoading || loadingUsage) return (
+    <SafeAreaView style={styles.main}>
+      <ActivityIndicator color={colors.primary} size={"large"} />
+    </SafeAreaView>
+  )
+
+  const ListEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyTextContainer}>
+        <Text style={styles.emptyTitle}>No app data available</Text>
+        <Text style={styles.emptySubtitle}>
+          You haven&apos;t selected any apps yet. To see your usage stats, please add apps to your tracked list.
+        </Text>
+      </View>
+    </View>
+  )
+
+  return (
+    <SafeAreaView style={styles.main}>
+      {/* Warning banner */}
+      {!hasPermissionToViewUsageStats && (
+        <View style={styles.warningBanner}>
+          <Ionicons name="alert-circle" size={20} color={colors.warning} />
+          <View style={styles.bannerText}>
+            <Text style={styles.bannerTitle}>Enable Usage Access</Text>
+            <Text style={styles.bannerSubtitle}>Grant permission to see your stats</Text>
+          </View>
+          <Pressable
+            style={styles.enableButton}
+            onPress={() => openUsagePermissionSettings()}
+          >
+            <Text style={styles.enableButtonText}>Enable</Text>
+          </Pressable>
+        </View>
+      )}
+      
+      <View>
+        <Text style={styles.title}>Scroll Budget</Text>
+        <Text style={styles.weekday}>{today.toLocaleDateString('en-US', { weekday: 'long' })}</Text>
+        <View style={styles.dateRow}>
+          <Text style={styles.dateRowText}>{today.toLocaleDateString('en-us', { dateStyle: "long" })}</Text>
+          {scrollBudgetInMs > 0 && (
+            <>
+              <View style={styles.dotSeparator} />
+              <Text style={styles.dateRowText}>
+                {formatDurationFromMilliseconds(scrollBudgetInMs)} daily budget
+              </Text>
+            </>
+          )}
+        </View>
+        {scrollBudgetInMs === 0 && (
+          <Link
+            href="/AccountManagement/ManageScrollBudget"
+            style={styles.setBudgetText}
+          >
+            Set your daily budget
+          </Link>
+        )}
+      </View>
+
+      <View>
+        <UsagePreview 
+          scrollBudgetInMs={scrollBudgetInMs}
+          budgetUsedInMs={totalUsageInMs}
+        />
+      </View>
+
+      <View style={styles.listView}>
+        {
+          loadingUsage ? (
+            <ActivityIndicator color={colors.primary} size={"large"} />
+          ) :
+          <FlatList 
+            data={usageStats}
+            keyExtractor={(item) => item.packageName}
+            renderItem={({item}) => (
+              <AppUsageCard 
+                scrollBudgetInMs={scrollBudgetInMs}
+                app={item}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
+            ListEmptyComponent={ListEmptyComponent}
+          />
+        }
+      </View>
+
+      <PermissionModal
+        visible={showPermissionModal}
+        onOpenSettings={handleOpenSettings}
+        onDismiss={handlePermissionModalDismiss}
+      />
+      <ErrorModal
+        modalVisible={showError}
+        onCloseModal={() => setShowError(false)}
+        error={error}
+      />
+    </SafeAreaView>
+  )
+}
+
+export default Dashboard
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    gap: spacing.xl,
+  },
+
+  warningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.warningLight,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: 15,
+    borderWidth: 0.5,
+    borderColor: colors.warningMuted,
+  },
+
+  bannerText: {
+    flex: 1,
+  },
+
+  bannerTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: typography.small,
+    color: colors.dark,
+    marginTop: 2,
+    textTransform: "uppercase",
+  },
+
+  bannerSubtitle: {
+    fontFamily: fonts.regular,
+    fontSize: typography.xs,
+    color: colors.darkMuted,
+  },
+
+  enableButton: {
+    backgroundColor: colors.warning,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 8,
+  },
+
+  enableButtonText: {
+    fontFamily: fonts.semiBold,
+    fontSize: typography.xs,
+    color: colors.surface,
+  },
+
+  title: {
+    fontSize: typography.body,
+    fontFamily: fonts.regular,
+    color: colors.darkMuted,
+    textTransform: "uppercase",
+  },
+
+  weekday: {
+    fontSize: typography.heading,
+    fontFamily: fonts.semiBold,
+    color: colors.dark,
+  },
+
+  dateRow: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    alignItems: "center",
+  },
+
+  dateRowText: {
+    fontSize: typography.body,
+    fontFamily: fonts.regular,
+    color: colors.darkMuted,
+  },
+
+  dotSeparator: {
+    width: 5,
+    height: 5,
+    backgroundColor: colors.darkMuted,
+    borderRadius: 2.5,
+  },
+
+  setBudgetText: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: typography.body,
+    marginTop: spacing.sm,
+  },
+
+  listView: {
+    flex: 1,
+  },
+
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  emptyTextContainer: {
+    alignItems: "center",
+    maxWidth: 300,
+  },
+  
+  emptyTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: typography.body,
+    color: colors.dark,
+    textAlign: "center",
+  },
+
+  emptySubtitle: {
+    fontFamily: fonts.regular,
+    fontSize: typography.caption,
+    color: colors.darkMuted,
+    textAlign: 'center',
+  },
+
+  listItemSeparator: {
+    width: "100%",
+    height: 1,
+    backgroundColor: colors.surfaceMuted,
+  }
+})
