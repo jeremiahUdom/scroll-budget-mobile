@@ -39,8 +39,8 @@ Note: Scroll Budget is currently available for Android only.
 
 ### Set Scroll Budget
 
-![Set Scroll Budget](assets/screenshots/set-scroll-budget-1.jpg)
-![Set Scroll Budget](assets/screenshots/set-scroll-budget.jpg)
+![Set Scroll Budget](assets/screenshots/Set-scroll-budget-1.jpg)
+![Set Scroll Budget](assets/screenshots/Set-scroll-budget.jpg)
 
 ## 🛠️ Tech Stack
 
