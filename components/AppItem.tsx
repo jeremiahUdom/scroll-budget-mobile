@@ -12,11 +12,8 @@ interface Props {
 }
 
 const AppItem = ({item, onSelected, appSelected=false}: Props) => {
-  const [isEnabled, setIsEnabled] = useState(appSelected ?? false)
-
   const toggleSwitch = () => {
     onSelected(item.packageName)
-    setIsEnabled(previousState => !previousState)
   }
 
   return (
@@ -33,9 +30,9 @@ const AppItem = ({item, onSelected, appSelected=false}: Props) => {
       </View>
       <Switch
         trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
-        thumbColor={ isEnabled ? colors.primaryMuted : colors.darkMuted }
+        thumbColor={ appSelected ? colors.primaryMuted : colors.darkMuted }
         onValueChange={toggleSwitch}
-        value={isEnabled}
+        value={appSelected}
       />
     </View>
   )

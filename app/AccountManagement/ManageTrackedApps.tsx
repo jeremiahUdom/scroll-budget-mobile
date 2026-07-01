@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
@@ -23,6 +23,34 @@ const SelectApps = () => {
   const [selectedApps, setSelectedApps] = useState<string[]>([])
   const [apps, setApps] = useState<App[]>([])
   const [initialising, setInitialising] = useState(true)
+
+  const selectedSet = useMemo(() => new Set(selectedApps), [selectedApps])
+
+  const handleSelected = useCallback((packageName: string) => {
+    setSelectedApps(prev =>
+      prev.includes(packageName)
+        ? prev.filter(app => app !== packageName)
+        : [...prev, packageName]
+    )
+  }, [])
+
+  const renderItem = useCallback(({ item }: { item: App }) => (
+    <AppItem
+      item={item}
+      onSelected={handleSelected}
+      appSelected={selectedSet.has(item.packageName)}
+    />
+  ), [handleSelected, selectedSet])
+
+  const keyExtractor = useCallback((item: App) => item.packageName, [])
+
+  const ListFooter = useCallback(() => (
+    <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
+  ), [selectedApps.length])
+
+  const ListHeader = useCallback(() => (
+    <Text style={styles.caption}>Scroll down to see all apps</Text>
+  ), [])
 
   useFocusEffect(
     useCallback(() => {
@@ -55,16 +83,6 @@ const SelectApps = () => {
       fetchSelectedApps()
     }, [])
   )
-
-  const handleSelected = (packageName: string) => {
-    setSelectedApps(prev => {
-      if (prev.includes(packageName)) {
-        return prev.filter(app => app !== packageName)  // remove
-      } else {
-        return [...prev, packageName]  // add
-      }
-    })
-  }
 
   const handleContine = async () => {
     if (selectedApps.length === 0) {
@@ -118,16 +136,13 @@ const SelectApps = () => {
             ) : (
               <FlatList 
                 data={apps}
-                keyExtractor={(item) => item.packageName}
-                renderItem={({item}) => (
-                  <AppItem 
-                    item={item}
-                    onSelected={handleSelected}
-                    appSelected={selectedApps.includes(item.packageName)}
-                  />
-                )}
-                ListFooterComponent={() => (<Text style={styles.caption}>{selectedApps.length} apps chosen</Text>)}
-                ListHeaderComponent={() => (<Text style={styles.caption}>Scroll down to see all apps</Text>)}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
+                ListFooterComponent={ListFooter}
+                ListHeaderComponent={ListHeader}
+                initialNumToRender={12}
+                maxToRenderPerBatch={12}
+                windowSize={7}
               />
             )
           }

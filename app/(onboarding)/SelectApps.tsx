@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
@@ -22,6 +22,30 @@ const SelectApps = () => {
   const [loading, setLoading] = useState(false)
   const [selectedApps, setSelectedApps] = useState<string[]>([])
   const [apps, setApps] = useState<App[]>([])
+
+  const selectedSet = useMemo(() => new Set(selectedApps), [selectedApps])
+
+  const handleSelected = useCallback((packageName: string) => {
+    setSelectedApps(prev =>
+      prev.includes(packageName)
+        ? prev.filter(p => p !== packageName)
+        : [...prev, packageName]
+    )
+  }, [])
+
+  const renderItem = useCallback(({ item }: { item: App }) => (
+    <AppItem 
+      item={item}
+      onSelected={handleSelected}
+      appSelected={selectedSet.has(item.packageName)}
+    />
+  ), [handleSelected, selectedSet])
+
+  const keyExtractor = useCallback((item: App) => item.packageName, [])
+
+  const ListFooter = useCallback(() => (
+    <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
+  ), [selectedApps.length])
   
   // runs immediately the screen is focused
   useFocusEffect(
@@ -43,10 +67,6 @@ const SelectApps = () => {
       fetchSelectedApps()
     }, [])
   )
-
-  const handleSelected = (packageName: string) => {
-    setSelectedApps(prev => [...prev, packageName])
-  }
 
   const handleContine = async () => {
     if (selectedApps.length === 0) {
@@ -100,15 +120,10 @@ const SelectApps = () => {
           {
             !initialising
             ? <FlatList 
-              data={apps}
-              keyExtractor={(item) => item.packageName}
-              renderItem={({item}) => (
-                <AppItem 
-                  item={item}
-                  onSelected={handleSelected}
-                />
-              )}
-              ListFooterComponent={() => (<Text style={styles.caption}>{selectedApps.length} apps chosen</Text>)}
+                data={apps}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
+                ListFooterComponent={ListFooter}
             />
             : <ActivityIndicator size={"large"} color={colors.primary} />
           }

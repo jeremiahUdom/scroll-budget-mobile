@@ -4,6 +4,7 @@ import { create } from "axios"
 
 // Base URL for the API
 const BASE_URL = process.env.EXPO_PUBLIC_SERVER_API_URL
+console.log("BASE_URL", BASE_URL)
 
 // axios instance for public API requests
 export const publicApi = create({
