@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Switch, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 import { colors } from '@/constants/colors'
 import { App } from '@/types/App'
 import { spacing } from '@/constants/spacing'
