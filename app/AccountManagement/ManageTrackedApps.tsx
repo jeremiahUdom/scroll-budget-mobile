@@ -10,7 +10,6 @@ import AppButton from '@/components/AppButton'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { updateSelectedAppsApi } from '@/api/app.api'
 import ErrorModal from '@/components/ErrorModal'
-import { getTrackedApps, setTrackedApps } from '@/utils/userPreference'
 import GoBackBtn from '@/components/GoBackBtn'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { App } from '@/types/App'
@@ -57,9 +56,6 @@ const SelectApps = () => {
     useCallback(() => {
       const fetchSelectedApps = async () => {
         try {
-          // get the apps that are already being tracked
-          const selectedApps = await getTrackedApps()
-
           // get all the installed apps on the user's phone
           const installedApps = await getInstalledApps()
           setSelectedApps(myTrackedApps)
@@ -126,7 +122,7 @@ const SelectApps = () => {
 
       <View style={styles.listView}>
         <Text style={styles.heading}>Choose apps to track</Text>
-        <Text style={styles.supportingText}>Pick the apps where you tend to lose time.</Text>
+        <Text style={styles.supportingText}>Pick the apps where you tend to lose time. So can help you track your usage. You can change this later</Text>
 
         <View style={styles.listView}>
           <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>

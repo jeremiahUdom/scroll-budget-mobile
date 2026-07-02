@@ -81,6 +81,7 @@ const SelectApps = () => {
 
     setLoading(true)
     try {
+      // update tracked apps in the context
       await updateTrackedApps(selectedApps)
 
       // send selected apps to the database for storage
@@ -118,7 +119,7 @@ const SelectApps = () => {
 
       <View style={styles.listView}>
         <Text style={styles.heading}>Choose apps to track</Text>
-        <Text style={styles.supportingText}>Pick the apps where you tend to lose time. You can change this later.</Text>
+        <Text style={styles.supportingText}>Pick the apps where you tend to lose time, So can help you track your usage. You can change this later.</Text>
 
         <View style={styles.listView}>
           <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
@@ -215,5 +216,6 @@ const styles = StyleSheet.create({
     fontSize: typography.caption,
     color: colors.darkMuted,
     fontFamily: fonts.regular,
+    marginBottom: spacing.md,
   }
 })

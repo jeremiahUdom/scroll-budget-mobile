@@ -11,7 +11,6 @@ import { Link, useRouter } from 'expo-router'
 import * as z from "zod"
 import { updateMyBudget } from '@/api/user.api'
 import AppButton from '@/components/AppButton'
-import { setScrollBudget } from '@/utils/userPreference'
 import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 

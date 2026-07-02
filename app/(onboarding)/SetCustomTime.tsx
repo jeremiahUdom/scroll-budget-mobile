@@ -11,7 +11,6 @@ import { updateMyBudget } from '@/api/user.api'
 import { useRouter } from 'expo-router'
 import ErrorModal from '@/components/ErrorModal'
 import * as z from "zod"
-import { setScrollBudget } from '@/utils/userPreference'
 import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
 import GoBackBtn from '@/components/GoBackBtn'
 import { useUserPreference } from '@/context/UserPreferenceContext'

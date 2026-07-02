@@ -1,10 +1,10 @@
 import React, { createContext, useState, useContext } from 'react'
-import { TrackedApp } from '@/types/App'
+import { App } from '@/types/App'
 import { setScrollBudget, setTrackedApps } from '@/utils/userPreference'
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
-  myTrackedApps: TrackedApp[]
-  updateTrackedApps: (apps: TrackedApp[]) => Promise<void>
+  myTrackedApps: App[]
+  updateTrackedApps: (apps: App[]) => Promise<void>
   updateScrollBudget: (budgetInMs: number) => Promise<void>
 }
 
@@ -26,10 +26,10 @@ export const useUserPreference = () => {
 }
 
 export const UserPreferenceProvider = ({ children }: Props) => {
-  const [myTrackedApps, setMyTrackedApps] = useState<TrackedApp[]>([])
+  const [myTrackedApps, setMyTrackedApps] = useState<App[]>([])
   const [scrollBudgetInMs, setScrollBudgetInMs] = useState(0)
 
-  const updateTrackedApps = async (apps: TrackedApp[]) => {
+  const updateTrackedApps = async (apps: App[]) => {
     try {
       setMyTrackedApps(apps)
       await setTrackedApps(apps.map(app => app.packageName))

@@ -18,8 +18,6 @@ const Profile = () => {
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
 
-  console.log(userProfile)
-
   if (!userProfile) {
     return (
       <SafeAreaView style={styles.main}>

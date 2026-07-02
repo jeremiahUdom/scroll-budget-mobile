@@ -1,8 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react'
-import { createUserWithEmailAndPassword, FirebaseAuthTypes, getAuth, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "@react-native-firebase/auth"
+import { createUserWithEmailAndPassword, FirebaseAuthTypes, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "@react-native-firebase/auth"
 import { UserProfile } from '@/types/UserProfile'
 import { createProfile, fetchMyData } from '@/api/user.api'
-import { setScrollBudget, setTrackedApps } from '@/utils/userPreference'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { useUserPreference } from './UserPreferenceContext'
 
@@ -60,7 +59,7 @@ export const AuthProvider = ({ children }: Props) => {
         // store user profile in the context
         setUserProfile(profile)
       } catch (error) {
-        console.log("Profile creation failed:", error);
+        console.error("Profile creation failed:", error);
 
         // rollback firebase user creation if user profile creation fails
         try {
@@ -80,6 +79,8 @@ export const AuthProvider = ({ children }: Props) => {
         message: `An email verification link has been sent to ${email}. Please click the link to verify your email`,
       }
     } catch (error) {
+      console.error("An error occured during signup. Please try again", error);
+      
       const err = error as { code?: string }
 
       if (err.code === "auth/email-already-in-use") {
@@ -131,7 +132,6 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const handleAuthStateChanged = async (user: FirebaseAuthTypes.User | null) => {
       setFirebaseUser(user)
-      console.log("user")
 
       if (!user) {
         setFirebaseUser(null)
