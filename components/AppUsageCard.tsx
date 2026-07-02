@@ -4,16 +4,17 @@ import { spacing } from '@/constants/spacing'
 import { colors } from '@/constants/colors'
 import { fonts } from '@/constants/fonts'
 import { typography } from '@/constants/typography'
-import { AppUsageStat } from '@/types/App'
+import { TrackedAppUsageStat } from '@/types/App'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 
 interface Props {
   scrollBudgetInMs: number
-  app: AppUsageStat,
+  app: TrackedAppUsageStat,
   customStyle?: ViewStyle
+  isLoadingUsage?: boolean
 }
 
-const AppUsageCard = ({scrollBudgetInMs, app, customStyle}: Props) => {
+const AppUsageCard = ({scrollBudgetInMs, app, customStyle, isLoadingUsage=false}: Props) => {
   const hasBudget = scrollBudgetInMs > 0;
   const totalTimeInForeground = formatDurationFromMilliseconds(app.totalTimeInForeground)
   const budgetUsagePercentage = hasBudget
@@ -37,15 +38,15 @@ const AppUsageCard = ({scrollBudgetInMs, app, customStyle}: Props) => {
 
         <View style={styles.infoItem}>
           <Text style={styles.appTitle}>{app.name}</Text>
-          <Text style={styles.statValue}>{totalTimeInForeground} used</Text>
+          <Text style={styles.statValue}>{!isLoadingUsage ? totalTimeInForeground : "-"} used</Text>
         </View>
 
         <View style={styles.infoItem}>
           <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBarFill, { width: `${progressWidth}%` }]} />
+            <View style={[styles.progressBarFill, !isLoadingUsage ? { width: `${progressWidth}%` } : null]} />
           </View>
             <Text style={styles.statValue}>
-              {hasBudget ? `${budgetUsagePercentage}%` : "--"}
+              { !isLoadingUsage || hasBudget ? `${budgetUsagePercentage}%` : "--"}
             </Text>
         </View>
       </View>

@@ -3,8 +3,8 @@ import { getAuth } from "@react-native-firebase/auth"
 import { create } from "axios"
 
 // Base URL for the API
-const BASE_URL = process.env.EXPO_PUBLIC_SERVER_API_URL
-console.log("BASE_URL", BASE_URL)
+// const BASE_URL = process.env.EXPO_PUBLIC_SERVER_API_URL
+const BASE_URL = `http://10.201.130.117:3000/v1`
 
 // axios instance for public API requests
 export const publicApi = create({

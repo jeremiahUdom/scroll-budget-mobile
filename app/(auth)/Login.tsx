@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { spacing } from '@/constants/spacing'
 import { colors } from '@/constants/colors'
@@ -12,6 +12,7 @@ import AppInput from '@/components/AppInput'
 import * as z from "zod"
 import { useAuth } from '@/context/AuthContext'
 import ErrorModal from '@/components/ErrorModal'
+import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const dataSchema = z.object({
   email: z.email(),

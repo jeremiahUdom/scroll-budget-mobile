@@ -11,21 +11,23 @@ import { useFocusEffect, Link } from 'expo-router'
 import { getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
 import PermissionModal from '@/components/PermissionModal'
 import Ionicons from '@react-native-vector-icons/ionicons'
-import { AppUsageStat } from '@/types/App'
+import { TrackedAppUsageStat } from '@/types/App'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
-import { sendUsageToServer } from '@/app/api/usage.api'
+import { sendUsageToServer } from '@/api/usage.api'
 import ErrorModal from '@/components/ErrorModal'
 
 const Dashboard = () => {
   const today = new Date()
-  const {scrollBudgetInMs, myTrackedApps, loading: preferencesLoading} = useUserPreference()
-  const [usageStats, setUsageStats] = useState<AppUsageStat[]>([])
+  const {scrollBudgetInMs, myTrackedApps} = useUserPreference()
+  const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([])
   const [hasPermissionToViewUsageStats, setHasPermissionToViewUsageStats] = useState(false)
   const [showPermissionModal, setShowPermissionModal] = useState(false)
   const [loadingUsage, setLoadingUsage] = useState(true)
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
+
+  const isInitialLoad = usageStats.length === 0
 
   useFocusEffect(
     useCallback(() => {
@@ -64,7 +66,7 @@ const Dashboard = () => {
               b.totalTimeInForeground -
               a.totalTimeInForeground
           )
-
+          
           setUsageStats(usageStats)
 
           // 4. Send to backend for analytics (async)
@@ -85,8 +87,8 @@ const Dashboard = () => {
         }
       }
 
-      if (!preferencesLoading) loadDashboard()
-    }, [myTrackedApps, preferencesLoading])
+      loadDashboard()
+    }, [myTrackedApps])
   )
 
   // Calculate total usage in milliseconds for all tracked apps
@@ -106,13 +108,6 @@ const Dashboard = () => {
   const handleOpenSettings = () => {
     setShowPermissionModal(false)
   }
-
-  // If both preferences and usage stats are loading, show a loading indicator
-  if (preferencesLoading || loadingUsage) return (
-    <SafeAreaView style={styles.main}>
-      <ActivityIndicator color={colors.primary} size={"large"} />
-    </SafeAreaView>
-  )
 
   const ListEmptyComponent = () => (
     <View style={styles.emptyContainer}>
@@ -143,6 +138,10 @@ const Dashboard = () => {
           </Pressable>
         </View>
       )}
+
+      {(loadingUsage) && (
+        <ActivityIndicator size="small" color={colors.primary} />
+      )}
       
       <View>
         <Text style={styles.title}>Scroll Budget</Text>
@@ -172,27 +171,23 @@ const Dashboard = () => {
         <UsagePreview 
           scrollBudgetInMs={scrollBudgetInMs}
           budgetUsedInMs={totalUsageInMs}
+          isDashboardLoading={isInitialLoad}
         />
       </View>
 
       <View style={styles.listView}>
-        {
-          loadingUsage ? (
-            <ActivityIndicator color={colors.primary} size={"large"} />
-          ) :
-          <FlatList 
-            data={usageStats}
-            keyExtractor={(item) => item.packageName}
-            renderItem={({item}) => (
-              <AppUsageCard 
-                scrollBudgetInMs={scrollBudgetInMs}
-                app={item}
-              />
-            )}
-            ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
-            ListEmptyComponent={ListEmptyComponent}
-          />
-        }
+        <FlatList 
+          data={usageStats}
+          keyExtractor={(item) => item.packageName}
+          renderItem={({item}) => (
+            <AppUsageCard 
+              scrollBudgetInMs={scrollBudgetInMs}
+              app={item}
+            />
+          )}
+          ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
+          ListEmptyComponent={ListEmptyComponent}
+        />
       </View>
 
       <PermissionModal

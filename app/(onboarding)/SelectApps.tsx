@@ -8,30 +8,34 @@ import { fonts } from '@/constants/fonts'
 import AppItem from '@/components/AppItem'
 import AppButton from '@/components/AppButton'
 import { Link, useFocusEffect, useRouter } from 'expo-router'
-import { storeSelectedAppsApi } from '@/app/api/app.api'
+import { storeSelectedAppsApi } from '@/api/app.api'
 import ErrorModal from '@/components/ErrorModal'
-import { setTrackedApps } from '@/utils/userPreference'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { App } from '@/types/App'
+import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const SelectApps = () => {
   const router = useRouter()
+  const {updateTrackedApps} = useUserPreference()
   const [initialising, setInitialising] = useState(false)
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [selectedApps, setSelectedApps] = useState<string[]>([])
+  const [selectedApps, setSelectedApps] = useState<App[]>([])
   const [apps, setApps] = useState<App[]>([])
 
-  const selectedSet = useMemo(() => new Set(selectedApps), [selectedApps])
+  const selectedSet = useMemo(() => new Set(selectedApps.map(app => app.packageName)), [selectedApps])
 
   const handleSelected = useCallback((packageName: string) => {
+    const trackedAppData = apps.find(app => app.packageName === packageName)
+    if (!trackedAppData) return;
+
     setSelectedApps(prev =>
-      prev.includes(packageName)
-        ? prev.filter(p => p !== packageName)
-        : [...prev, packageName]
+      prev.some(app => app.packageName === packageName)
+        ? prev.filter(app => app.packageName !== packageName)
+        : [...prev, {...trackedAppData}]
     )
-  }, [])
+  }, [apps])
 
   const renderItem = useCallback(({ item }: { item: App }) => (
     <AppItem 
@@ -43,9 +47,9 @@ const SelectApps = () => {
 
   const keyExtractor = useCallback((item: App) => item.packageName, [])
 
-  const ListFooter = useCallback(() => (
-    <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
-  ), [selectedApps.length])
+  const ListHeader = useCallback(() => (
+    <Text style={styles.caption}>Scroll down to see all apps</Text>
+  ), [])
   
   // runs immediately the screen is focused
   useFocusEffect(
@@ -68,7 +72,7 @@ const SelectApps = () => {
     }, [])
   )
 
-  const handleContine = async () => {
+  const handleContinue = async () => {
     if (selectedApps.length === 0) {
       setError("You have not chosen any app.")
       setShowError(true)
@@ -77,13 +81,13 @@ const SelectApps = () => {
 
     setLoading(true)
     try {
-      // send selected apps to the database for storage
-      await storeSelectedAppsApi(selectedApps)
+      await updateTrackedApps(selectedApps)
 
-      // store the users selected apps on the local storage for fast lookup.
-      setTrackedApps(selectedApps)
+      // send selected apps to the database for storage
+      await storeSelectedAppsApi(selectedApps.map(app => app.packageName))
 
       router.replace("/(tabs)")
+      
       return
     } catch (error) {
       if (error instanceof Error) {
@@ -117,20 +121,24 @@ const SelectApps = () => {
         <Text style={styles.supportingText}>Pick the apps where you tend to lose time. You can change this later.</Text>
 
         <View style={styles.listView}>
+          <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
           {
             !initialising
             ? <FlatList 
                 data={apps}
                 keyExtractor={keyExtractor}
                 renderItem={renderItem}
-                ListFooterComponent={ListFooter}
+                ListHeaderComponent={ListHeader}
+                initialNumToRender={12}
+                maxToRenderPerBatch={12}
+                windowSize={7}
             />
             : <ActivityIndicator size={"large"} color={colors.primary} />
           }
         </View>
       </View>
 
-      <AppButton isLoading={loading} onButtonPressed={handleContine}>
+      <AppButton isLoading={loading} onButtonPressed={handleContinue}>
         Continue
       </AppButton>
 

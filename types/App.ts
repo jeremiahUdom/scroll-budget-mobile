@@ -8,7 +8,7 @@ export type App = {
   versionName: string
 }
 
-export type AppUsageStat = {
+export type TrackedAppUsageStat = {
   icon: string
   iconHash: string
   name: string

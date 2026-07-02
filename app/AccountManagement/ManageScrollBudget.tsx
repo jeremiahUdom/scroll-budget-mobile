@@ -7,13 +7,14 @@ import { typography } from '@/constants/typography'
 import { fonts } from '@/constants/fonts'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import AppButton from '@/components/AppButton'
-import { updateMyBudget } from '@/app/api/user.api'
+import { updateMyBudget } from '@/api/user.api'
 import { useRouter } from 'expo-router'
 import ErrorModal from '@/components/ErrorModal'
 import * as z from "zod"
 import { setScrollBudget } from '@/utils/userPreference'
 import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
 import GoBackBtn from '@/components/GoBackBtn'
+import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const clamp = (value: number, min: number, max: number) => (
   Math.min(Math.max(value, min), max)
@@ -33,6 +34,7 @@ const minutesSchema = z.object({
 
 const ManageScrollBudget = () => {
   const router = useRouter()
+  const {updateScrollBudget} = useUserPreference()
   const [loading, setLoading] = useState(false)
   const [updateError, setUpdateError] = useState("")
   const [showUpdateError, setShowUpdateError] = useState(false)
@@ -152,11 +154,10 @@ const ManageScrollBudget = () => {
       // convert the hours and minutes to total minutes
       const budgetInMinutes = (parseInt(hours) * 60) + parseInt(minutes)
   
-      // update the budget on the server
+      // updates the scroll budget in the context
+      await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
+      // update the budget on the db
       await updateMyBudget(minutesToMilliseconds(budgetInMinutes))
-
-      // update the budget in local storage
-      await setScrollBudget(minutesToMilliseconds(budgetInMinutes))
 
       router.replace("/(tabs)/Profile")
 

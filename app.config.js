@@ -21,7 +21,7 @@ export default {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.jeremiahudom.scrollbudget",
-      "googleServicesFile": process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json "
+      "googleServicesFile": process.env.GOOGLE_SERVICES_JSON,
     },
     "web": {
       "output": "static",

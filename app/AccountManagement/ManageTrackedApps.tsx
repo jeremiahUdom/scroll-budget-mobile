@@ -8,31 +8,36 @@ import { fonts } from '@/constants/fonts'
 import AppItem from '@/components/AppItem'
 import AppButton from '@/components/AppButton'
 import { useFocusEffect, useRouter } from 'expo-router'
-import { updateSelectedAppsApi } from '@/app/api/app.api'
+import { updateSelectedAppsApi } from '@/api/app.api'
 import ErrorModal from '@/components/ErrorModal'
 import { getTrackedApps, setTrackedApps } from '@/utils/userPreference'
 import GoBackBtn from '@/components/GoBackBtn'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { App } from '@/types/App'
+import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const SelectApps = () => {
   const router = useRouter()
+  const { myTrackedApps, updateTrackedApps } = useUserPreference()
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [selectedApps, setSelectedApps] = useState<string[]>([])
+  const [selectedApps, setSelectedApps] = useState<App[]>([])
   const [apps, setApps] = useState<App[]>([])
   const [initialising, setInitialising] = useState(true)
 
-  const selectedSet = useMemo(() => new Set(selectedApps), [selectedApps])
+  const selectedSet = useMemo(() => new Set(selectedApps.map(app => app.packageName)), [selectedApps])
 
   const handleSelected = useCallback((packageName: string) => {
+    const trackedAppData = apps.find(app => app.packageName === packageName)
+    if (!trackedAppData) return;
+
     setSelectedApps(prev =>
-      prev.includes(packageName)
-        ? prev.filter(app => app !== packageName)
-        : [...prev, packageName]
+      prev.some(app => app.packageName === packageName)
+        ? prev.filter(app => app.packageName !== packageName)
+        : [...prev, trackedAppData]
     )
-  }, [])
+  }, [apps])
 
   const renderItem = useCallback(({ item }: { item: App }) => (
     <AppItem
@@ -43,10 +48,6 @@ const SelectApps = () => {
   ), [handleSelected, selectedSet])
 
   const keyExtractor = useCallback((item: App) => item.packageName, [])
-
-  const ListFooter = useCallback(() => (
-    <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
-  ), [selectedApps.length])
 
   const ListHeader = useCallback(() => (
     <Text style={styles.caption}>Scroll down to see all apps</Text>
@@ -61,7 +62,7 @@ const SelectApps = () => {
 
           // get all the installed apps on the user's phone
           const installedApps = await getInstalledApps()
-          setSelectedApps(selectedApps)
+          setSelectedApps(myTrackedApps)
           setApps(installedApps)
           return
         } catch (error) {
@@ -93,11 +94,10 @@ const SelectApps = () => {
 
     setLoading(true)
     try {
-      // update the selected apps on the server
-      await updateSelectedAppsApi(selectedApps)
+      await updateTrackedApps(selectedApps)
 
-      // update the selected apps in local storage
-      await setTrackedApps(selectedApps)
+      // update the selected apps on the server
+      await updateSelectedAppsApi(selectedApps.map(app => app.packageName))
 
       router.replace("/(tabs)/Profile")
       return
@@ -138,7 +138,6 @@ const SelectApps = () => {
                 data={apps}
                 keyExtractor={keyExtractor}
                 renderItem={renderItem}
-                ListFooterComponent={ListFooter}
                 ListHeaderComponent={ListHeader}
                 initialNumToRender={12}
                 maxToRenderPerBatch={12}

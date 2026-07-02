@@ -1,8 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react'
 import { createUserWithEmailAndPassword, FirebaseAuthTypes, getAuth, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "@react-native-firebase/auth"
 import { UserProfile } from '@/types/UserProfile'
-import { createProfile, fetchProfile } from '@/app/api/user.api'
-import { setScrollBudget } from '@/utils/userPreference'
+import { createProfile, fetchMyData } from '@/api/user.api'
+import { setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
+import { useUserPreference } from './UserPreferenceContext'
 
 type AuthContextType = {
   firebaseUser: FirebaseAuthTypes.User | null
@@ -31,11 +33,14 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }: Props) => {
+  const {updateScrollBudget, updateTrackedApps} = useUserPreference()
   const [firebaseUser, setFirebaseUser] = useState<FirebaseAuthTypes.User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isInitialising, setIsInitialising] = useState(true)
+  const isSigningUp = useRef(false)
 
   const signup = async ({ email, password }: any) => {
+    isSigningUp.current = true
     try {
       // create a new user on firebase
       const userCredential = await createUserWithEmailAndPassword(
@@ -82,6 +87,8 @@ export const AuthProvider = ({ children }: Props) => {
       }
 
       throw new Error("Unable to create account. Please try again.")
+    } finally {
+      isSigningUp.current = false
     }
   }
 
@@ -93,8 +100,11 @@ export const AuthProvider = ({ children }: Props) => {
       // get the users access token
       await getAuth().currentUser?.getIdToken(true)
 
+      const userData = await fetchMyData()
+
       return {
-        success: true
+        success: true,
+        trackedApps: userData.trackedApps,
       }
     } catch (error) {
       const err = error as { code?: string }
@@ -121,6 +131,7 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const handleAuthStateChanged = async (user: FirebaseAuthTypes.User | null) => {
       setFirebaseUser(user)
+      console.log("user")
 
       if (!user) {
         setFirebaseUser(null)
@@ -129,12 +140,21 @@ export const AuthProvider = ({ children }: Props) => {
         return
       }
 
+      if (isSigningUp.current) {
+        // signup() is already handling profile creation + sync for this user
+        setIsInitialising(false)
+        return
+      }
+
       try {
-        const userProfile = await fetchProfile()
-        await setScrollBudget(userProfile.scrollBudgetInMs)
-        setUserProfile(userProfile)
+        const userData = await fetchMyData()
+        setUserProfile(userData.user)
+        const userInstalledApps = await getInstalledApps()
+        const userTrackedApps = userInstalledApps.filter(app => userData.trackedApps.includes(app.packageName)).map(app => ({...app, totalTimeInForeground: 0}))
+        await updateTrackedApps(userTrackedApps)
+        await updateScrollBudget(userData.user.scrollBudgetInMs)
       } catch (error) {
-        console.error(error)
+        console.error(error, "error")
       } finally {
         setIsInitialising(false)
       }

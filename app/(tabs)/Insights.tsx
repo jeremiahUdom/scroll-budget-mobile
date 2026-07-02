@@ -9,14 +9,14 @@ import { fonts } from '@/constants/fonts'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { useFocusEffect } from 'expo-router'
 import { WeeklyAnalyticsResponse } from '@/types/WeeklyAnalytics'
-import { getWeeklyAnalyticsApi } from '@/app/api/analytics.api'
+import { getWeeklyAnalyticsApi } from '@/api/analytics.api'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import AppUsageCard from '@/components/AppUsageCard'
 import {BarChart} from "react-native-gifted-charts"
 import { getWeekDateRange } from '@/utils/getWeekDateRange'
 import ErrorModal from '@/components/ErrorModal'
 
-const chartWidth = Dimensions.get("screen").width - (spacing.lg * 2)
+const chartWidth = Dimensions.get("screen").width - spacing.lg
 
 const Insight = () => {
   const { myTrackedApps } = useUserPreference()
@@ -24,7 +24,6 @@ const Insight = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
-  const isInitialLoad = loading && (weeklyAnalytics === null)
 
   useFocusEffect(
     useCallback(() => {
@@ -138,14 +137,6 @@ const Insight = () => {
       }
     }) ?? []
 
-  if (isInitialLoad) {
-    return (
-      <SafeAreaView style={styles.loaderContainer}>
-        <ActivityIndicator color={colors.primary} size={"large"} />
-      </SafeAreaView>
-    )
-  }
-
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView contentContainerStyle={styles.scrollView}>
@@ -164,64 +155,79 @@ const Insight = () => {
         <View style={styles.cardRow}>
           <View style={styles.card}>
             <Text style={styles.label}>Daily avg</Text>
-            <Text style={styles.value}>{formatDurationFromMilliseconds(weeklyAnalytics?.dailyAverageInMs ?? 0)}</Text>
+            <Text style={styles.value}>{weeklyAnalytics ? formatDurationFromMilliseconds(weeklyAnalytics.dailyAverageInMs) : '-'}</Text>
           </View>
           <View style={styles.card}>
             <Text style={styles.label}>Days on track</Text>
-            <Text style={styles.value}>{weeklyAnalytics?.daysOnTrack}/7</Text>
+            <Text style={styles.value}>{weeklyAnalytics ? `${weeklyAnalytics.daysOnTrack}/7` : '-'}</Text>
           </View>
         </View>
 
         <View style={styles.totalCard}>
           <Text style={styles.label}>Total this week</Text>
-          <Text style={styles.value}>{formatDurationFromMilliseconds(weeklyAnalytics?.totalScreenTimeInMs ?? 0)}</Text>
+          <Text style={styles.value}>{weeklyAnalytics ? formatDurationFromMilliseconds(weeklyAnalytics.totalScreenTimeInMs) : '-'}</Text>
           <View style={styles.trendRow}>
-            <Ionicons name={trendIcon} size={20} color={trendColor} />
-            <Text style={styles.trend}> {weeklyAnalytics?.weeklyTrend.percentage}% vs last week</Text>
+            {weeklyAnalytics?.weeklyTrend && (
+              <>
+                <Ionicons name={trendIcon} size={20} color={trendColor} />
+                <Text style={styles.trend}> {weeklyAnalytics.weeklyTrend.percentage}% vs last week</Text>
+              </>
+            )}
           </View>
         </View>
 
         <View style={styles.chartCard}>
           <Text style={styles.label}>Daily Usage</Text>
-          <BarChart
-            data={chartData}
-            width={chartWidth}
-            height={220}
-            maxValue={24}
-            barWidth={22}
-            spacing={18}
-            barBorderTopLeftRadius={8}
-            barBorderTopRightRadius={8}
-            hideYAxisText
-            xAxisThickness={0}
-            yAxisThickness={0}
-            xAxisColor={colors.surfaceMuted}
-            yAxisColor={colors.surfaceMuted}
-            hideRules={false}
-            rulesColor={colors.surfaceMuted}
-            yAxisTextStyle={{
-              color: colors.darkMuted,
-              fontFamily: fonts.medium,
-              fontSize: typography.small,
-            }}
-            xAxisLabelTextStyle={{
-              color: colors.darkMuted,
-              fontFamily: fonts.medium,
-              fontSize: typography.small,
-            }}
-          />
+          <View style={{position: "relative"}}>
+            <BarChart
+              data={chartData}
+              width={chartWidth}
+              height={220}
+              maxValue={24}
+              barWidth={40}
+              spacing={18}
+              barBorderTopLeftRadius={8}
+              barBorderTopRightRadius={8}
+              hideYAxisText
+              xAxisThickness={2}
+              yAxisThickness={2}
+              xAxisColor={colors.surfaceMuted}
+              yAxisColor={colors.surfaceMuted}
+              hideRules={false}
+              rulesColor={colors.surfaceMuted}
+              yAxisTextStyle={{
+                color: colors.darkMuted,
+                fontFamily: fonts.medium,
+                fontSize: typography.small,
+              }}
+              xAxisLabelTextStyle={{
+                color: colors.darkMuted,
+                fontFamily: fonts.medium,
+                fontSize: typography.small,
+              }}
+              showScrollIndicator
+              scrollAnimation
+              scrollToEnd
+
+            />
+          </View>
         </View>
 
         <View style={styles.mostUsedApp}>
           <Text style={styles.label}>Most used app</Text>
-          {mostUsedAppStat ? (
-            <AppUsageCard
-              app={mostUsedAppStat}
-              scrollBudgetInMs={weeklyAnalytics?.totalScreenTimeInMs ?? 0}
-            />
-          ) : (
-            <Text style={styles.trend}>No app usage this week.</Text>
-          )}
+          {
+            !weeklyAnalytics ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) :
+            mostUsedAppStat ? (
+              <AppUsageCard
+                app={mostUsedAppStat}
+                scrollBudgetInMs={weeklyAnalytics?.totalScreenTimeInMs ?? 0}
+              />
+            ) : (
+              <Text style={styles.trend}>No app usage this week.</Text>
+            )
+          }
         </View>
       </ScrollView>
 

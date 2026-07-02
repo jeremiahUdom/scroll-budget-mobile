@@ -1,12 +1,12 @@
 import { Image, StyleSheet, Switch, Text, View } from 'react-native'
 import React from 'react'
 import { colors } from '@/constants/colors'
-import { App } from '@/types/App'
+import { TrackedApp } from '@/types/App'
 import { spacing } from '@/constants/spacing'
 import { fonts } from '@/constants/fonts'
 import { typography } from '@/constants/typography'
 interface Props {
-  item: App
+  item: TrackedApp
   onSelected: (packageName: string) => void
   appSelected?: boolean
 }

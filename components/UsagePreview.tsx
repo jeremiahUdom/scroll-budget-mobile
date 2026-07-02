@@ -10,12 +10,13 @@ import { spacing } from '@/constants/spacing'
 interface Props {
   scrollBudgetInMs: number
   budgetUsedInMs: number
-  isOnTrack?: boolean
+  isDashboardLoading?: boolean
 }
 
 const UsagePreview = ({
   scrollBudgetInMs = 0,
   budgetUsedInMs = 0,
+  isDashboardLoading = false
 }: Props) => {
   const hasBudget = scrollBudgetInMs > 0;
   const percentageUsed = hasBudget
@@ -87,18 +88,18 @@ const UsagePreview = ({
 
       {/* Center content */}
       <View style={styles.centerContent}>
-        <Text style={styles.timeUsed}>{formatDurationFromMilliseconds(budgetUsedInMs)}</Text>
+        <Text style={styles.timeUsed}>{isDashboardLoading ? '-' : formatDurationFromMilliseconds(budgetUsedInMs)}</Text>
         <Text style={styles.label}>used today</Text>
         {hasBudget ? (
           <>
             {percentageUsed < 100 && (
               <Text style={styles.timeLeft}>
-                {getBudgetLeft(scrollBudgetInMs, budgetUsedInMs)} left
+                {isDashboardLoading ? '-' : getBudgetLeft(scrollBudgetInMs, budgetUsedInMs)} left
               </Text>
             )}
 
             <Text style={styles.status}>
-              {getRemark(percentageUsed)}
+              {isDashboardLoading ? '-' : getRemark(percentageUsed)}
             </Text>
           </>
         ) : (
