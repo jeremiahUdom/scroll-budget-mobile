@@ -78,7 +78,7 @@ const SelectApps = () => {
       }
 
       fetchSelectedApps()
-    }, [])
+    }, [myTrackedApps])
   )
 
   const handleContine = async () => {
@@ -90,6 +90,7 @@ const SelectApps = () => {
 
     setLoading(true)
     try {
+      // update tracked apps in the preference context
       await updateTrackedApps(selectedApps)
 
       // update the selected apps on the server
