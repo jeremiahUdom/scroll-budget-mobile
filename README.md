@@ -1,120 +1,103 @@
 # Scroll Budget
 
-Scroll Budget is a React Native application that helps users build healthier screen-time habits by setting a daily scroll budget for their favorite apps. Instead of asking users to delete apps, Scroll Budget encourages mindful usage through tracking, visual feedback, and weekly insights.
+React Native / Expo Android app for Scroll Budget — track time spent on the apps you choose, set daily limits, and view usage insights.
 
-## ✨ Features
+---
 
-- 🔐 Secure authentication with Firebase Authentication
-- ⏱️ Set a daily scroll budget
-- 📱 Track usage across selected apps
-- 📊 Dashboard with real-time progress
-- 📈 Weekly analytics and usage trends
-- 📉 Per-app usage breakdown
-- 💾 Local caching for faster startup and offline support
-- ⚙️ Manage tracked apps and scroll budget anytime
+## Tech Stack
 
-## 📥 Download
+- **Framework:** React Native + Expo (Expo Router)
+- **Language:** TypeScript
+- **Auth:** Firebase Authentication (with Email/Password Auth)
+- **Charts:** react-native-gifted-charts
+- **Animation:** react-native-svg + react-native-reanimated
+- **Usage tracking:** `@sahil_sensei/react-native-app-usage`
 
-Download the latest Android APK from the Releases page.
+---
 
-➡️ Add your GitHub Releases link here
+## Prerequisites
 
-Note: Scroll Budget is currently available for Android only.
+- Node.js (LTS recommended)
+- Expo CLI (`npm install -g expo-cli` or use `npx expo`)
+- Android device or emulator (Usage Access features require a physical Android device or an emulator with usage-stats support — some emulators don't reliably report usage stats)
+- EAS CLI for builds (`npm install -g eas-cli`)
+- google-services.json
 
-## 📱 Screenshots
+## Getting Started
 
-### Dashboard
+1. **Clone the repo**
 
-![Dashboard](assets/screenshots/Dashboard.jpg)
+   ```bash
+   git clone https://github.com/jeremiahUdom/scroll-budget-mobile.git
+   cd scroll-budget-mobile
+   ```
 
-### Weekly Insights
+2. **Install dependencies**
 
-![Weekly Insights](assets/screenshots/Insights.jpg)
+   ```bash
+   npm install
+   ```
 
-![Weekly Insights](assets/screenshots/Insights-1.jpg)
+3. **Set up environment variables**
 
-### Select Apps
+   Create a `.env` file in the project root:
 
-![Select Apps](assets/screenshots/select-apps.jpg)
+   ```
+   EXPO_PUBLIC_API_URL=https://your-backend-url.onrender.com
+   ```
 
-### Set Scroll Budget
+4. **Add `google-services.json`**
 
-![Set Scroll Budget](assets/screenshots/Set-scroll-budget-1.jpg)
-![Set Scroll Budget](assets/screenshots/Set-scroll-budget.jpg)
+   Place your Firebase `google-services.json` file in the project root. This is referenced dynamically via `app.config.js` (not `app.json`) to support environment-specific builds.
+   Don't have one yet? Follow Firebase's guide to [add Firebase to your Android app](https://firebase.google.com/docs/android/setup) and download the config file for your project.
 
-## 🛠️ Tech Stack
+5. **Run the app**
+   ```bash
+   npx expo start
+   ```
+   Scan the QR code with Expo Go, or press `a` to launch on a connected Android device/emulator.
 
-### Mobile
+---
 
-- React Native
-- Expo
-- TypeScript
-- Expo Router
-- React Context API
+## Building for Android
 
-### Backend
+This project uses **EAS Build** for producing installable APKs.
 
-- Node.js
-- Express.js
-- Typescript
-- Prisma ORM
-- PostgreSQL
+```bash
+eas build --platform android --profile preview
+```
 
-### Libraries
+- `preview` profile → generates an installable APK for internal testing/dev builds
+- `production` profile → generates an AAB for Play Store submission
 
-- React Native Gifted Charts
-- React Native SVG
-- React Native App Usage
-- Async Storage
-- React Native Reanimated
+Make sure your EAS secrets (env vars, `google-services.json`) are configured via `eas secret:create` or the EAS dashboard before building.
 
-## Authentication
+---
 
-- Firebase Authentication
+## Project Structure
 
-## Native Android
+```
+android/            # Native Android project files
+api/                # API client functions (calls to backend)
+app/                # Expo Router screens (file-based routing)
+assets/             # Images, fonts, and other static assets
+components/         # Reusable UI components
+constants/          # Colors, spacing, typography, fonts
+context/            # Auth & user preference providers
+hooks/              # Shared custom hooks
+scripts/            # One-off / dev scripts
+types/              # Shared TypeScript types
+utils/              # Local storage helpers (tracked apps, preferences)
+```
 
-## 🏗️ Architecture
+---
 
-The application follows a modular architecture that separates responsibilities into dedicated layers.
+## Known Gotchas
 
-- **Context API** manages authentication and user preferences.
-- **API layer** handles communication with the backend.
-- **Utility layer** manages formatting, local storage, and shared helpers.
-- **Component layer** contains reusable UI components.
-- **Screens** focus on presentation and user interactions.
+- **Usage Access permission** can't be requested via a normal runtime dialog — it must be granted manually via Android Settings. Use the library's `hasUsagePermission()` / `openUsagePermissionSettings()` helpers to guide users there.
 
-User preferences such as the daily scroll budget and tracked apps are cached locally to improve startup performance while remaining synchronized with the backend.
-
-## 🔗 Related Repos
-
-- [scroll-budget-backend](https://github.com/jeremiahUdom/scroll-budget-backend.git)
-
-## 🤝 Contributing
-
-This is currently a personal project, so external contributions are not being accepted at this time.
+---
 
 ## License
 
-Copyright © 2026 Jeremiah Udom. All rights reserved.
-
-This repository and its contents — including but not limited to source code,
-documentation, and visual assets (screenshots, icons, and branding) — are
-made available for viewing purposes only.
-
-No part of this project may be copied, modified, distributed, sublicensed,
-or used to create derivative works, in whole or in part, without prior
-written permission from the author.
-
-This project is not open source. Viewing this repository does not grant
-any license to use, reproduce, or distribute the software or its assets.
-
-## Feedback
-
-If you encounter a bug or have a feature request, please open an issue in this repository.
-
-Your feedback helps improve Scroll Budget.
-
-## 👤 Author
-
-**Jeremiah Udom**
+All Rights Reserved.
