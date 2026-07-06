@@ -15,6 +15,15 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
 
 ---
 
+## Backend
+
+This app talks to a separate Express/TypeScript + Prisma Postgres backend, deployed on Render.
+
+- Backend repo: `https://github.com/jeremiahUdom/scroll-budget-backend.git`
+- See that repo's README for API setup, environment variables, and deployment instructions.
+
+---
+
 ## Prerequisites
 
 - Node.js (LTS recommended)
@@ -43,7 +52,7 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
    Create a `.env` file in the project root:
 
    ```
-   EXPO_PUBLIC_API_URL=https://your-backend-url.onrender.com
+   EXPO_PUBLIC_SERVER_API_URL=https://your-backend-url.onrender.com
    ```
 
 4. **Add `google-services.json`**
@@ -52,10 +61,14 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
    Don't have one yet? Follow Firebase's guide to [add Firebase to your Android app](https://firebase.google.com/docs/android/setup) and download the config file for your project.
 
 5. **Run the app**
+
    ```bash
    npx expo start
    ```
+
    Scan the QR code with Expo Go, or press `a` to launch on a connected Android device/emulator.
+
+   > **Note:** Usage Access tracking relies on a native module (`@sahil_sensei/react-native-app-usage`), which is **not available in Expo Go**. To test tracking end-to-end, build a dev client (see below) rather than relying on Expo Go alone.
 
 ---
 
@@ -64,9 +77,10 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
 This project uses **EAS Build** for producing installable APKs.
 
 ```bash
-eas build --platform android --profile preview
+eas build --platform android --profile development
 ```
 
+- `development` profile → generates a debug build with expo-dev-client bundled in, for use with `npx expo start --dev-client` during active development
 - `preview` profile → generates an installable APK for internal testing/dev builds
 - `production` profile → generates an AAB for Play Store submission
 
