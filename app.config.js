@@ -28,7 +28,7 @@ export default {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#1D9E75",
+          "backgroundColor": "#EAF5F0",
         }
       ],
       [
