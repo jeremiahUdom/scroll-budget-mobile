@@ -49,7 +49,7 @@ const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModal
 
           {/* Subtitle */}
           <Text style={styles.subtitle}>
-            Grant permission to see your app usage stats
+            Grant permission to see your app usage stats and stay within your daily budget.
           </Text>
 
           {/* Buttons container */}

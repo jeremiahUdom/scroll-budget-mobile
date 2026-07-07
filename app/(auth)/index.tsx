@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Linking, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { spacing } from '@/constants/spacing'
@@ -13,6 +13,7 @@ import * as z from "zod"
 import { useAuth } from '@/context/AuthContext'
 import ErrorModal from '@/components/ErrorModal'
 import MessageModal from '@/components/MessageModal'
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/links'
 
 const dataSchema = z.object({
   email: z.email(),
@@ -136,7 +137,7 @@ const Auth = () => {
         <View style={styles.view}>
           <AppButton isLoading={loading} onButtonPressed={handleCreateAccount}>Create Account</AppButton>
           <Text style={styles.agreement}>
-            By continuing, you agree to our <Link href={"/"} style={styles.link}>Terms</Link> & <Link href={"/"} style={styles.link}>Privacy Policy</Link>
+            By continuing, you agree to our <Text onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)} style={styles.link}>Terms</Text> & <Text onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} style={styles.link}>Privacy Policy</Text>
           </Text>
         </View>
 

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'expo-router'
@@ -11,6 +11,7 @@ import Ionicons from '@react-native-vector-icons/ionicons'
 import AppButton from '@/components/AppButton'
 import ErrorModal from '@/components/ErrorModal'
 import { setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/links'
 
 const Profile = () => {
   const router = useRouter()
@@ -76,14 +77,14 @@ const Profile = () => {
             </View>
           </Pressable>
 
-          <Pressable onPress={() => router.push("/AccountManagement/ManageTrackedApps")} style={styles.section}>
+          <Pressable onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} style={styles.section}>
             <View style={styles.row}>
               <Text style={styles.label}>Privacy Policy</Text>
               <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
             </View>
           </Pressable>
 
-          <Pressable onPress={() => router.push("/AccountManagement/ManageTrackedApps")} style={styles.section}>
+          <Pressable onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)} style={styles.section}>
             <View style={styles.row}>
               <Text style={styles.label}>Terms Of Service</Text>
               <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
