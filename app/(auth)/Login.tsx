@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { spacing } from '@/constants/spacing'
 import { colors } from '@/constants/colors'
-import Ionicons from '@react-native-vector-icons/ionicons'
 import { typography } from '@/constants/typography'
 import { fonts } from '@/constants/fonts'
 import { Link, useRouter } from 'expo-router'
@@ -12,7 +11,6 @@ import AppInput from '@/components/AppInput'
 import * as z from "zod"
 import { useAuth } from '@/context/AuthContext'
 import ErrorModal from '@/components/ErrorModal'
-import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const dataSchema = z.object({
   email: z.email(),
@@ -93,8 +91,12 @@ const Login = () => {
     <SafeAreaView style={styles.main}>
       <View style={styles.view}>
         <View style={styles.view}>
-          <View style={styles.logo}>
-            <Ionicons name="time-outline" size={50} color={colors.surface} />
+          <View style={styles.appIconWrapper}>
+            <Image
+              source={require("@/assets/images/android-icon-foreground.png")}
+              style={styles.appIcon}
+              resizeMode="contain"
+            />
           </View>
 
           <View style={styles.view}>
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  logo: {
+  appIconWrapper: {
     width: 80,
     height: 80,
     borderRadius: 20,
@@ -164,6 +166,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  appIcon: {
+    width: 100,
+    height: 100,
   },
 
   title: {
