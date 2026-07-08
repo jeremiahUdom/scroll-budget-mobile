@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
@@ -8,13 +8,26 @@ import { fonts } from '@/constants/fonts'
 import UsagePreview from '@/components/UsagePreview'
 import AppUsageCard from '@/components/AppUsageCard'
 import { useFocusEffect, Link } from 'expo-router'
-import { getDailyUsageRange, getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
+import { getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
 import PermissionModal from '@/components/PermissionModal'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import { TrackedAppUsageStat } from '@/types/App'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import ErrorModal from '@/components/ErrorModal'
+import { initialiseBackgroundTask } from '@/utils/utils'
+import * as TaskManager from "expo-task-manager"
+
+TaskManager.getRegisteredTasksAsync().then((tasks) => {
+  console.log(tasks)
+})
+
+let resolver: (() => void) | null
+const promise = new Promise<void>((resolve) => {
+  resolver = resolve
+})
+
+initialiseBackgroundTask(promise)
 
 const Dashboard = () => {
   const today = new Date()
@@ -84,7 +97,7 @@ const Dashboard = () => {
       }
 
       loadDashboard()
-    }, [myTrackedApps, scrollBudgetInMs])
+    }, [myTrackedApps])
   )
 
   // Calculate total usage in milliseconds for all tracked apps
@@ -104,6 +117,13 @@ const Dashboard = () => {
   const handleOpenSettings = () => {
     setShowPermissionModal(false)
   }
+
+  useEffect(() => {
+    if (resolver) {
+      resolver()
+      console.log("resolver called")
+    }
+  }, [])
 
   const ListEmptyComponent = () => (
     <View style={styles.emptyContainer}>

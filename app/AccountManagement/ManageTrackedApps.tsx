@@ -29,7 +29,7 @@ const SelectApps = () => {
 
   const handleSelected = useCallback((packageName: string) => {
     const trackedAppData = apps.find(app => app.packageName === packageName)
-    if (!trackedAppData) return;
+    if (!trackedAppData) return
 
     setSelectedApps(prev =>
       prev.some(app => app.packageName === packageName)
@@ -50,6 +50,13 @@ const SelectApps = () => {
 
   const ListHeader = useCallback(() => (
     <Text style={styles.caption}>Scroll down to see all apps</Text>
+  ), [])
+
+  const ListEmptyComponent = useCallback(() => (
+    <View>
+      <Text style={styles.emptyStateTitle}>No Apps Found</Text>
+      <Text style={styles.emptyStateText}>It looks like you don&apos;t have any apps installed yet</Text>
+    </View>
   ), [])
 
   useFocusEffect(
@@ -123,7 +130,7 @@ const SelectApps = () => {
         <Text style={styles.supportingText}>Pick the apps where you tend to lose time. So can help you track your usage. You can change this later</Text>
 
         <View style={styles.listView}>
-          <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
+          {apps.length !== 0 && <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>}
           { 
             initialising ? (
             <ActivityIndicator size="large" color={colors.primary} />
@@ -132,10 +139,11 @@ const SelectApps = () => {
                 data={apps}
                 keyExtractor={keyExtractor}
                 renderItem={renderItem}
-                ListHeaderComponent={ListHeader}
+                ListHeaderComponent={apps.length !== 0 ? ListHeader : null}
                 initialNumToRender={12}
                 maxToRenderPerBatch={12}
                 windowSize={7}
+                ListEmptyComponent={ListEmptyComponent}
               />
             )
           }
@@ -168,26 +176,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
 
-  steps: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted, 
-    borderRadius: 30,
-  },
-
-  stepText: {
-    fontSize: typography.caption,
-    fontFamily: fonts.medium,
-    color: colors.primary,
-  },
-
-  skipText: {
-    color: colors.darkMuted,
-    fontSize: typography.body,
-    fontFamily: fonts.medium,
-    textAlign: "center",
-  },
-
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
@@ -206,6 +194,19 @@ const styles = StyleSheet.create({
   listView: {
     flex: 1,
     paddingVertical: spacing.sm,
+  },
+
+  emptyStateTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: typography.medium,
+    color: colors.darkMuted,
+    marginBottom: spacing.sm,
+  },
+
+  emptyStateText: {
+    fontFamily: fonts.regular,
+    fontSize: typography.body,
+    color: colors.darkMuted,
   },
 
   caption: {

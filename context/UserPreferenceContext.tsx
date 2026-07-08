@@ -1,12 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { App } from '@/types/App'
-import { getScrollBudget, getTrackedApps, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getHasOnboarded, getScrollBudget, getTrackedApps, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
   myTrackedApps: App[]
   updateTrackedApps: (apps: App[]) => Promise<void>
   updateScrollBudget: (budgetInMs: number) => Promise<void>
+  isInitialising: boolean
+  hasOnboarded: boolean
 }
 
 const UserPreferenceContext = createContext<UserPreferenceContextType | undefined>(undefined)
@@ -29,6 +31,8 @@ export const useUserPreference = () => {
 export const UserPreferenceProvider = ({ children }: Props) => {
   const [myTrackedApps, setMyTrackedApps] = useState<App[]>([])
   const [scrollBudgetInMs, setScrollBudgetInMs] = useState(0)
+  const [isInitialising, setIsInitialising] = useState(true)
+  const [hasOnboarded, setHasOnboarded] = useState(false)
 
   const updateTrackedApps = async (apps: App[]) => {
     try {
@@ -57,23 +61,36 @@ export const UserPreferenceProvider = ({ children }: Props) => {
   useEffect(() => {
     const initialiseApp = async () => {
       try {
+        // fetch user installed apps on startup from @sahil_sensei/react-native-app-usage
         const installedApps = await getInstalledApps()
+
+        // get tracked apps from async storage 
         const trackedApps = await getTrackedApps()
+        // filter installed apps to get user tracked apps(if any) from it and store data in the context
         setMyTrackedApps(installedApps.filter(app => trackedApps.includes(app.packageName)))
-        const budget = await getScrollBudget() 
+
+        // get users budget from async storage
+        const budget = await getScrollBudget()
+        // store users budget in the context
         setScrollBudgetInMs(budget)
+
+        // get hasOnboarded from async storage
+        const hasOnboarded = await getHasOnboarded()
+        // store hasOnboarded in context
+        setHasOnboarded(hasOnboarded)
       } catch (error) {
         console.error("App initialisation failed", error)
-        throw new Error("Failed to fetch app data. Please try again.")
+      } finally {
+        setIsInitialising(false)
       }
     }
 
     initialiseApp()
-  }, [])
+    }, [])
 
   return (
     <UserPreferenceContext.Provider
-      value={{ myTrackedApps, scrollBudgetInMs, updateTrackedApps, updateScrollBudget }}>
+      value={{ myTrackedApps, scrollBudgetInMs, updateTrackedApps, updateScrollBudget, isInitialising, hasOnboarded }}>
       {children}
     </UserPreferenceContext.Provider>
   )

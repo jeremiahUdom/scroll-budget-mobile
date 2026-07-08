@@ -49,6 +49,13 @@ const SelectApps = () => {
   const ListHeader = useCallback(() => (
     <Text style={styles.caption}>Scroll down to see all apps</Text>
   ), [])
+
+  const ListEmptyComponent = useCallback(() => (
+    <View>
+      <Text style={styles.emptyStateTitle}>No Apps Found</Text>
+      <Text style={styles.emptyStateText}>It looks like you don&apos;t have any apps installed yet</Text>
+    </View>
+  ), [])
   
   // runs immediately the screen is focused
   useFocusEffect(
@@ -83,7 +90,7 @@ const SelectApps = () => {
       // update tracked apps in the context
       await updateTrackedApps(selectedApps)
 
-      router.replace("/(tabs)")
+      router.replace("/SetDailyBudget")
       
       return
     } catch (error) {
@@ -118,17 +125,18 @@ const SelectApps = () => {
         <Text style={styles.supportingText}>Pick the apps where you tend to lose time, So can help you track your usage. You can change this later.</Text>
 
         <View style={styles.listView}>
-          <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>
+          {apps.length !== 0 && <Text style={styles.caption}>{selectedApps.length} apps chosen</Text>}
           {
             !initialising
             ? <FlatList 
                 data={apps}
                 keyExtractor={keyExtractor}
                 renderItem={renderItem}
-                ListHeaderComponent={ListHeader}
+                ListHeaderComponent={apps.length !== 0 ? ListHeader : null}
                 initialNumToRender={12}
                 maxToRenderPerBatch={12}
                 windowSize={7}
+                ListEmptyComponent={ListEmptyComponent}
             />
             : <ActivityIndicator size={"large"} color={colors.primary} />
           }
@@ -206,6 +214,19 @@ const styles = StyleSheet.create({
   listView: {
     flex: 1,
     paddingVertical: spacing.sm,
+  },
+
+  emptyStateTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: typography.medium,
+    color: colors.darkMuted,
+    marginBottom: spacing.sm,
+  },
+
+  emptyStateText: {
+    fontFamily: fonts.regular,
+    fontSize: typography.body,
+    color: colors.darkMuted,
   },
 
   caption: {

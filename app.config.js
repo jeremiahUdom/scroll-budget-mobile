@@ -43,7 +43,8 @@ export default {
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true,
