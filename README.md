@@ -8,19 +8,9 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
 
 - **Framework:** React Native + Expo (Expo Router)
 - **Language:** TypeScript
-- **Auth:** Firebase Authentication (with Email/Password Auth)
 - **Charts:** react-native-gifted-charts
 - **Animation:** react-native-svg + react-native-reanimated
 - **Usage tracking:** `@sahil_sensei/react-native-app-usage`
-
----
-
-## Backend
-
-This app talks to a separate Express/TypeScript + Prisma Postgres backend, deployed on Render.
-
-- Backend repo: `https://github.com/jeremiahUdom/scroll-budget-backend.git`
-- See that repo's README for API setup, environment variables, and deployment instructions.
 
 ---
 
@@ -47,20 +37,7 @@ This app talks to a separate Express/TypeScript + Prisma Postgres backend, deplo
    npm install
    ```
 
-3. **Set up environment variables**
-
-   Create a `.env` file in the project root:
-
-   ```
-   EXPO_PUBLIC_SERVER_API_URL=https://your-backend-url.onrender.com
-   ```
-
-4. **Add `google-services.json`**
-
-   Place your Firebase `google-services.json` file in the project root. This is referenced dynamically via `app.config.js` (not `app.json`) to support environment-specific builds.
-   Don't have one yet? Follow Firebase's guide to [add Firebase to your Android app](https://firebase.google.com/docs/android/setup) and download the config file for your project.
-
-5. **Run the app**
+3. **Run the app**
 
    ```bash
    npx expo start
@@ -92,7 +69,6 @@ Make sure your EAS secrets (env vars, `google-services.json`) are configured via
 
 ```
 android/            # Native Android project files
-api/                # API client functions (calls to backend)
 app/                # Expo Router screens (file-based routing)
 assets/             # Images, fonts, and other static assets
 components/         # Reusable UI components
