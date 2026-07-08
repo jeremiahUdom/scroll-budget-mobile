@@ -93,10 +93,7 @@ const SelectApps = () => {
       // update tracked apps in the preference context
       await updateTrackedApps(selectedApps)
 
-      // update the selected apps on the server
-      await updateSelectedAppsApi(selectedApps.map(app => app.packageName))
-
-      router.replace("/(tabs)/Profile")
+      router.replace("/(tabs)/Settings")
       return
     } catch (error) {
       if (error instanceof Error) {
@@ -117,7 +114,7 @@ const SelectApps = () => {
     <SafeAreaView style={styles.main}>
       <View style={styles.backBtn}>
         <GoBackBtn 
-          onButtonPressed={() => router.replace("/(tabs)/Profile")}
+          onButtonPressed={() => router.replace("/(tabs)/Settings")}
         />
       </View>
 

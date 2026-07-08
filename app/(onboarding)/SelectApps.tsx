@@ -8,7 +8,6 @@ import { fonts } from '@/constants/fonts'
 import AppItem from '@/components/AppItem'
 import AppButton from '@/components/AppButton'
 import { Link, useFocusEffect, useRouter } from 'expo-router'
-import { storeSelectedAppsApi } from '@/api/app.api'
 import ErrorModal from '@/components/ErrorModal'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 import { App } from '@/types/App'
@@ -83,9 +82,6 @@ const SelectApps = () => {
     try {
       // update tracked apps in the context
       await updateTrackedApps(selectedApps)
-
-      // send selected apps to the database for storage
-      await storeSelectedAppsApi(selectedApps.map(app => app.packageName))
 
       router.replace("/(tabs)")
       

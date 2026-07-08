@@ -7,7 +7,7 @@ import React from 'react'
 
 export default function TabLayout() {
   return (     
-    <Tabs 
+    <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
@@ -27,10 +27,9 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen 
-        name="index"
+      <Tabs.Screen name='index' 
         options={{
-          title: "Today",
+          title: "Dashboard",
           tabBarIcon: ({color, size, focused}) => (
             <Ionicons 
               name={focused ? "home" : "home-outline"}
@@ -38,36 +37,21 @@ export default function TabLayout() {
               color={color}
             />
           )
-        }}
-      /> 
+        }} 
+      />
 
-      <Tabs.Screen 
-        name="Insights"
+      <Tabs.Screen name='Settings' 
         options={{
-          title: "Insights",
+          title: "Settings",
           tabBarIcon: ({color, size, focused}) => (
             <Ionicons 
-              name={focused ? "bar-chart" : "bar-chart-outline"}
+              name={focused ? "settings" : "settings-outline"}
               size={20}
               color={color}
             />
           )
-        }}
-      /> 
-
-      <Tabs.Screen 
-        name="Profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({color, size, focused}) => (
-            <Ionicons 
-              name={focused ? "person" : "person-outline"}
-              size={20}
-              color={color}
-            />
-          )
-        }}
-      /> 
+        }} 
+      />
     </Tabs>
   )
 }

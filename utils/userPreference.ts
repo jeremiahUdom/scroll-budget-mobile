@@ -3,6 +3,17 @@ import { saveData, getData, deleteData } from "./storage"
 
 const SCROLL_BUDGET_KEY = 'scrollBudgetInMs'
 const TRACKED_APPS_KEY = 'trackedApps'
+const HAS_ONBOARDED_KEY = 'hasOnboarded'
+
+export const setHasOnboarded = async (value: boolean) => 
+  saveData(HAS_ONBOARDED_KEY, value)
+
+
+export const getHasOnboarded = async (): Promise<boolean> => {
+  const hasOnboarded = await getData<boolean>(HAS_ONBOARDED_KEY)
+
+  return hasOnboarded ?? false
+}
 
 // Scroll Budget
 export const getScrollBudget = async (): Promise<number> => {

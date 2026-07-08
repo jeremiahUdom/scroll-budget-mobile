@@ -54,7 +54,7 @@ const Onboarding = () => {
   const handleContinue = () => {
     if (currentItem.value === ONBOARDING_ITEMS.length - 1) {
       currentItem.value = 0
-      router.replace("/(auth)")
+      router.replace("/AgreeTermsAndPolicies")
       return
     }
     currentItem.value += 1
@@ -100,7 +100,7 @@ const Onboarding = () => {
           Continue
         </AppButton>
 
-        <Link href={"/(auth)"} style={styles.skipText} replace>Skip intro</Link>
+        <Link href={"/AgreeTermsAndPolicies"} style={styles.skipText} replace>Skip intro</Link>
       </View>
     </SafeAreaView>
   )

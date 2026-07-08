@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext } from 'react'
+import React, { createContext, useState, useContext, useEffect } from 'react'
 import { App } from '@/types/App'
-import { setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getScrollBudget, getTrackedApps, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
   myTrackedApps: App[]
@@ -52,6 +53,23 @@ export const UserPreferenceProvider = ({ children }: Props) => {
       throw new Error("Failed to update scroll budget. Please try again.")
     }
   }
+
+  useEffect(() => {
+    const initialiseApp = async () => {
+      try {
+        const installedApps = await getInstalledApps()
+        const trackedApps = await getTrackedApps()
+        setMyTrackedApps(installedApps.filter(app => trackedApps.includes(app.packageName)))
+        const budget = await getScrollBudget() 
+        setScrollBudgetInMs(budget)
+      } catch (error) {
+        console.error("App initialisation failed", error)
+        throw new Error("Failed to fetch app data. Please try again.")
+      }
+    }
+
+    initialiseApp()
+  }, [])
 
   return (
     <UserPreferenceContext.Provider

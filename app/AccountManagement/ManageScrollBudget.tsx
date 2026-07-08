@@ -155,10 +155,8 @@ const ManageScrollBudget = () => {
   
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
-      // update the budget on the db
-      await updateMyBudget(minutesToMilliseconds(budgetInMinutes))
 
-      router.replace("/(tabs)/Profile")
+      router.replace("/(tabs)/Settings")
 
       return
     } catch (error) {
@@ -181,7 +179,7 @@ const ManageScrollBudget = () => {
     <SafeAreaView style={styles.main}>
       <View style={styles.backBtn}>
         <GoBackBtn 
-          onButtonPressed={() => router.replace("/(tabs)/Profile")}
+          onButtonPressed={() => router.replace("/(tabs)/Settings")}
         />
       </View>
 

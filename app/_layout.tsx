@@ -1,24 +1,43 @@
-import { AuthProvider, useAuth } from '@/context/AuthContext'
-import { UserPreferenceProvider } from '@/context/UserPreferenceContext';
-import { Slot } from 'expo-router'
-import * as SplashScreen from "expo-splash-screen"
-import { useEffect } from 'react';
+import { UserPreferenceProvider } from '@/context/UserPreferenceContext'
+import { getHasOnboarded } from '@/utils/userPreference'
+import { Slot, Redirect } from 'expo-router'
+import { useEffect, useState } from 'react'
+import * as SplashScreen from 'expo-splash-screen'
 
-// Run once, at module load — before any component renders
 SplashScreen.preventAutoHideAsync()
 
 const SplashGate = ({ children }: { children: React.ReactNode }) => {
-  const { isInitialising } = useAuth()
+  const [isInitialising, setIsInitialising] = useState(true)
+  const [hasOnboarded, setHasOnboarded] = useState(false)
+
+  // when app mounts, check if user has onboarded
+  useEffect(() => {
+    const initialiseApp = async () => {
+      // get 'hasOnboarded' from local storage
+      const onboarded = await getHasOnboarded()
+      setHasOnboarded(onboarded)
+      setIsInitialising(false)
+    }
+
+    initialiseApp()
+  }, [])
 
   useEffect(() => {
+    // if app has finished initialising hide splash screen
     if (!isInitialising) {
       SplashScreen.hideAsync()
     }
   }, [isInitialising])
 
+
   if (isInitialising) {
     // returning null keeps the native splash covering the screen
     return null
+  }
+
+  // go to tabs if user has onboarded
+  if (!hasOnboarded) {
+    return <Redirect href="/Onboarding" />
   }
 
   return <>{children}</>
@@ -27,13 +46,11 @@ const SplashGate = ({ children }: { children: React.ReactNode }) => {
 const AppLayout = () => {
   return (
     <UserPreferenceProvider>
-      <AuthProvider>
-        <SplashGate>
-          <Slot />
-        </SplashGate>
-      </AuthProvider>
+      <SplashGate>
+        <Slot />
+      </SplashGate>
     </UserPreferenceProvider>
   )
 }
 
-export default AppLayout;
+export default AppLayout

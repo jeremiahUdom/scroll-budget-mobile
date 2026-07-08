@@ -8,13 +8,12 @@ import { fonts } from '@/constants/fonts'
 import UsagePreview from '@/components/UsagePreview'
 import AppUsageCard from '@/components/AppUsageCard'
 import { useFocusEffect, Link } from 'expo-router'
-import { getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
+import { getDailyUsageRange, getHourlyUsage, hasUsagePermission, openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
 import PermissionModal from '@/components/PermissionModal'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import { TrackedAppUsageStat } from '@/types/App'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
-import { sendUsageToServer } from '@/api/usage.api'
 import ErrorModal from '@/components/ErrorModal'
 
 const Dashboard = () => {
@@ -68,9 +67,6 @@ const Dashboard = () => {
           )
           
           setUsageStats(usageStats)
-
-          // 4. Send to backend for analytics (async)
-          await sendUsageToServer(usageStats)
         } catch (error) {
           console.error('Dashboard load error:', error)
           if (error instanceof Error) {
@@ -88,7 +84,7 @@ const Dashboard = () => {
       }
 
       loadDashboard()
-    }, [myTrackedApps])
+    }, [myTrackedApps, scrollBudgetInMs])
   )
 
   // Calculate total usage in milliseconds for all tracked apps

@@ -8,8 +8,6 @@ import { fonts } from '@/constants/fonts'
 import ErrorModal from '@/components/ErrorModal'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import { Link, useRouter } from 'expo-router'
-import * as z from "zod"
-import { updateMyBudget } from '@/api/user.api'
 import AppButton from '@/components/AppButton'
 import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
 import { useUserPreference } from '@/context/UserPreferenceContext'
@@ -52,14 +50,6 @@ const PRESET: Item[] = [
   },
 ]
 
-export const setBudgetSchema = z.object({
-  budget: z
-    .number()
-    .int('Must be a whole number')
-    .min(1, 'Limit must be at least 1 minute')
-    .max(1440, 'Limit cannot exceed 24 hours')
-})
-
 const SetDailyBudget = () => {
   const router = useRouter()
   const {updateScrollBudget} = useUserPreference()
@@ -87,10 +77,8 @@ const SetDailyBudget = () => {
 
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(selectedItem))
-      // sends budget to db for storage
-      await updateMyBudget(minutesToMilliseconds(selectedItem))
 
-      router.replace("/(onboarding)/SelectApps")
+      router.replace("/(tabs)")
       return
     } catch (error) {
       if (error instanceof Error) {
