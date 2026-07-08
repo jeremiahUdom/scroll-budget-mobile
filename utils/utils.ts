@@ -1,13 +1,12 @@
 import * as BackgroundTask from "expo-background-task"
 import * as TaskManager from "expo-task-manager"
 import * as Notifications from "expo-notifications"
-import { getHourlyUsage } from "@sahil_sensei/react-native-app-usage"
 import { getUsageStatForTrackedApps } from "./getUsageStatForTrackedApps"
 import { getScrollBudget, getTrackedApps } from "./userPreference"
 import { getNotifiedThresholdsForToday, setNotifiedThresholdsForToday } from "./notification"
 
 const BACKGROUND_TASK_IDENTIFIER = "CHECK_USAGE_STAT"
-const MINIMUM_INTERVAL = 15
+const MINIMUM_INTERVAL = 5
 
 // Thresholds checked from highest to lowest so we never double-fire
 // in a single run (e.g. jumping from 75% -> 95% only notifies once, for 90%).
@@ -77,6 +76,8 @@ export const initialiseBackgroundTask = async (
   })
 
   if (!await(TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_IDENTIFIER))) {
-    await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER)
+    await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, {
+      minimumInterval: MINIMUM_INTERVAL,
+    })
   }
 }
