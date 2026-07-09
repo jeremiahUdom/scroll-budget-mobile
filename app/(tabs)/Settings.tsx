@@ -1,4 +1,4 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { colors } from '@/constants/colors'
@@ -36,14 +36,6 @@ const Profile = () => {
               label='Manage Tracked Apps'
               description={`${myTrackedApps.length} apps tracked`}
               onItemSelected={() => router.push("/AccountManagement/ManageTrackedApps")}
-            />
-
-            <View style={styles.hr} />
-
-            <SettingsItem
-              icon="notifications-outline"
-              label='Notifications'
-              onItemSelected={() => router.push("/AccountManagement/ManageNotificationsSettings")}
             />
           </View>
           

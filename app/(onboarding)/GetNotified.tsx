@@ -1,25 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
 import { typography } from '@/constants/typography'
 import { fonts } from '@/constants/fonts'
-import { Link, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { requestNotificationsPermission } from '@/utils/notificationService'
 import ErrorModal from '@/components/ErrorModal'
-import NotificationToggle from '@/components/NotificationToggle'
+import Ionicons from '@react-native-vector-icons/ionicons'
+import AppButton from '@/components/AppButton'
 
 const GetNotified = () => {
   const router = useRouter()
   const [error, setError] = useState("")
   const [showError, setShowError] = useState(false)
-  const [isEnabled, setIsEnabled] = useState(false)
 
   const enableNotification = async () => {
     try {
-      const r = await requestNotificationsPermission()
-      setIsEnabled(r)
+      await requestNotificationsPermission()
       router.replace("/(tabs)") 
       return
     } catch (error) {
@@ -36,19 +35,35 @@ const GetNotified = () => {
         <View style={styles.steps}>
           <Text style={styles.stepText}>Step 3 of 3</Text>
         </View>
-
-        <Link style={styles.skipText} href={"/SelectApps"} push>
-          Skip
-        </Link>
       </View>
 
       <View style={styles.header}>
-        <Text style={styles.heading}>Stay on Track</Text>
-        <Text style={styles.supportingText}>Get notified when you&apos;re close to your daily scroll budget and when you&apos;ve reached it. Notifications help you stay mindful without having to keep checking the app.</Text>  
-        <NotificationToggle 
-          enabled={isEnabled}
-          onToggle={enableNotification}
-        />
+        <Text style={styles.heading}>Know before you scroll too far</Text>
+        <Text style={styles.supportingText}>Turn on notifications so we can nudge you as you get close to your daily limit.</Text>  
+
+        <View style={styles.benefits}>
+          <View style={styles.benefit}>
+            <Ionicons name="warning-outline" size={25} color={colors.darkMuted} />
+            <Text style={styles.text}>A heads up at 80% of your budget</Text>
+          </View>
+          <View style={styles.benefit}>
+            <Ionicons name="flame-outline" size={25} color={colors.darkMuted} />
+            <Text style={styles.text}>Streak reminders so you don&apos;t break a good run</Text>
+          </View>
+          <View style={styles.benefit}>
+            <Ionicons name="bar-chart-outline" size={25} color={colors.darkMuted} />
+            <Text style={styles.text}>A weekly recap of your scroll time</Text>
+          </View>
+        </View>
+      </View>
+
+      <View>
+        <AppButton onButtonPressed={enableNotification}>
+          Enable Notifications
+        </AppButton>
+        <Pressable onPress={() => router.replace("/(tabs)")}>
+          <Text style={styles.notNow}>Not now</Text>
+        </Pressable>
       </View>
 
       <ErrorModal 
@@ -122,32 +137,28 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
 
-  btnRow: {
+  benefits: {
+    gap: spacing.md,
+  },
+
+  benefit: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    gap: spacing.sm,
     alignItems: "center",
   },
 
-  btn: {
-    width: "48%",
-    height: 60,
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+  text: {
+    fontSize: typography.caption,
+    color: colors.darkMuted,
+    fontFamily: fonts.regular,
+    maxWidth: 250
   },
 
-  btnDisable: {
-    backgroundColor: colors.surfaceMuted,
-  },
-
-  btnText: {
-    fontSize: typography.body,
-    color: colors.surface,
+  notNow: {
+    alignSelf: "center",
     fontFamily: fonts.semiBold,
-  },
-
-  btnTextDisable: {
-    color: colors.dark,
+    color: colors.darkMuted,
+    fontSize: typography.body,
+    marginTop: spacing.lg,
   }
 })
