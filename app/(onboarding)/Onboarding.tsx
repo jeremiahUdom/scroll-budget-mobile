@@ -154,4 +154,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     textAlign: "center"
   }
-});
+})

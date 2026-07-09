@@ -6,9 +6,9 @@ import { spacing } from '@/constants/spacing'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { fonts } from '@/constants/fonts'
 import { typography } from '@/constants/typography'
-import Ionicons from '@react-native-vector-icons/ionicons'
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/links'
 import { useUserPreference } from '@/context/UserPreferenceContext'
+import SettingsItem from '@/components/SettingsItem'
 
 const Profile = () => {
   const router = useRouter()
@@ -22,65 +22,50 @@ const Profile = () => {
           <Text style={styles.sectionLabel}>App</Text>
 
           <View style={styles.items}>
-            <Pressable onPress={() => router.push("/AccountManagement/ManageScrollBudget")} style={styles.item}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <Ionicons name="settings-outline" size={15} color={colors.primary}  />
-                </View>
-                <View>
-                  <Text style={styles.label}>Manage Scroll Budget</Text>
-                  <Text style={styles.description}>Set your daily limit</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
-            </Pressable>
+            <SettingsItem
+              icon="settings-outline"
+              label='Manage Scroll Budget'
+              description='Set Your Daily Limit' 
+              onItemSelected={() => router.push("/AccountManagement/ManageScrollBudget")}
+            />
 
             <View style={styles.hr} />
 
-            <Pressable onPress={() => router.push("/AccountManagement/ManageTrackedApps")} style={styles.item}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <Ionicons name="apps" size={15} color={colors.primary}  />
-                </View>
-                <View>
-                  <Text style={styles.label}>Manage Tracked Apps</Text>
-                  <Text style={styles.description}>{myTrackedApps.length} apps tracked</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
-            </Pressable>
+            <SettingsItem
+              icon="apps-outline"
+              label='Manage Tracked Apps'
+              description={`${myTrackedApps.length} apps tracked`}
+              onItemSelected={() => router.push("/AccountManagement/ManageTrackedApps")}
+            />
+
+            <View style={styles.hr} />
+
+            <SettingsItem
+              icon="notifications-outline"
+              label='Notifications'
+              onItemSelected={() => router.push("/AccountManagement/ManageNotificationsSettings")}
+            />
           </View>
+          
         </View>
 
         <View>
           <Text style={styles.sectionLabel}>Legal</Text>
 
           <View style={styles.items}>
-            <Pressable onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} style={styles.item}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <Ionicons name="shield-outline" size={15} color={colors.primary}  />
-                </View>
-                <View>
-                  <Text style={styles.label}>Privacy Policy</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
-            </Pressable>
+            <SettingsItem
+              icon="shield-outline"
+              label='Privacy Policy'
+              onItemSelected={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            />
 
             <View style={styles.hr} />
 
-            <Pressable onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)} style={styles.item}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <Ionicons name="document-text-outline" size={15} color={colors.primary}  />
-                </View>
-                <View>
-                  <Text style={styles.label}>Terms of Service</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.darkMuted} />
-            </Pressable>
+            <SettingsItem
+              icon="document-text-outline"
+              label='Terms of Service'
+              onItemSelected={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+            />
           </View>
         </View>
 
@@ -130,40 +115,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 1.5,
     backgroundColor: colors.surfaceMuted,
-  },
-
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: spacing.md,
-  },
-
-  row: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    alignItems: "center",
-  },
-
-  iconWrapper: {
-    width: 35,
-    height: 35,
-    backgroundColor: colors.primaryMuted,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-
-  label: {
-    color: colors.dark,
-    fontFamily: fonts.medium,
-    fontSize: typography.body,
-  },
-
-  description: {
-    color: colors.darkMuted,
-    fontFamily: fonts.regular,
-    fontSize: typography.small,
   },
 
   version: {

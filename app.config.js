@@ -44,7 +44,17 @@ export default {
       ],
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
-      "expo-background-task"
+      "expo-background-task",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#FFFFFF",
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

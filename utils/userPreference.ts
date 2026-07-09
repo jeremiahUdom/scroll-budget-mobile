@@ -5,7 +5,7 @@ const SCROLL_BUDGET_KEY = 'scrollBudgetInMs'
 const TRACKED_APPS_KEY = 'trackedApps'
 const HAS_ONBOARDED_KEY = 'hasOnboarded'
 
-export const setHasOnboarded = async (value: boolean) => 
+export const setHasOnboardedValue = async (value: boolean) => 
   saveData(HAS_ONBOARDED_KEY, value)
 
 

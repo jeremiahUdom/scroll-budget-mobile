@@ -9,15 +9,16 @@ import { useRouter } from 'expo-router'
 import AppButton from '@/components/AppButton'
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/links'
 import UsagePreview from '@/components/UsagePreview'
-import { setHasOnboarded } from '@/utils/userPreference'
+import { useUserPreference } from '@/context/UserPreferenceContext'
 
 const AgreeTermsAndPolicies = () => {
   const router = useRouter()
+  const {updateHasOnboarded} = useUserPreference()
   
   const handleContinue = async () => {
     try {
-      await setHasOnboarded(true)
-      router.replace("/(onboarding)/SelectApps")
+      await updateHasOnboarded(true)
+      router.replace("/SelectApps")
       return
     } catch (error) {
       console.error("Failed to update 'hasOnboarded'", error)

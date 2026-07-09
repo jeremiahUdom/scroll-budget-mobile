@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { App } from '@/types/App'
-import { getHasOnboarded, getScrollBudget, getTrackedApps, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getHasOnboarded, getScrollBudget, getTrackedApps, setHasOnboardedValue, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
@@ -9,6 +9,7 @@ type UserPreferenceContextType = {
   updateScrollBudget: (budgetInMs: number) => Promise<void>
   isInitialising: boolean
   hasOnboarded: boolean
+  updateHasOnboarded: (value: boolean) => Promise<void>
 }
 
 const UserPreferenceContext = createContext<UserPreferenceContextType | undefined>(undefined)
@@ -58,6 +59,16 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     }
   }
 
+  const updateHasOnboarded = async (value: boolean) => {
+    try {
+      setHasOnboarded(value)
+      await setHasOnboardedValue(value) // whatever your persistence fn is called in utils/userPreference
+    } catch (error) {
+      console.error("Failed to update onboarding status", error)
+      throw new Error("Failed to update onboarding status. Please try again.")
+    }
+  }
+
   useEffect(() => {
     const initialiseApp = async () => {
       try {
@@ -71,11 +82,13 @@ export const UserPreferenceProvider = ({ children }: Props) => {
 
         // get users budget from async storage
         const budget = await getScrollBudget()
+
         // store users budget in the context
         setScrollBudgetInMs(budget)
 
         // get hasOnboarded from async storage
         const hasOnboarded = await getHasOnboarded()
+
         // store hasOnboarded in context
         setHasOnboarded(hasOnboarded)
       } catch (error) {
@@ -86,11 +99,11 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     }
 
     initialiseApp()
-    }, [])
+  }, [])
 
   return (
     <UserPreferenceContext.Provider
-      value={{ myTrackedApps, scrollBudgetInMs, updateTrackedApps, updateScrollBudget, isInitialising, hasOnboarded }}>
+      value={{ myTrackedApps, scrollBudgetInMs, updateTrackedApps, updateScrollBudget, isInitialising, hasOnboarded, updateHasOnboarded }}>
       {children}
     </UserPreferenceContext.Provider>
   )

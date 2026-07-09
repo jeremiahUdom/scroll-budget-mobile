@@ -78,7 +78,7 @@ const SetDailyBudget = () => {
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(selectedItem))
 
-      router.replace("/(tabs)")
+      router.replace("/(onboarding)/GetNotified")
       return
     } catch (error) {
       if (error instanceof Error) {

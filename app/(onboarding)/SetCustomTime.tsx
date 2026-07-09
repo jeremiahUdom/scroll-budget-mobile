@@ -156,7 +156,7 @@ const SetCustomTime = () => {
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
 
-      router.replace("/(tabs)")
+      router.replace("/GetNotified")
       return
     } catch (error) {
       if (error instanceof Error) {

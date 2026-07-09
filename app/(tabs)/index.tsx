@@ -1,5 +1,5 @@
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { ActivityIndicator, Button, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
@@ -15,19 +15,7 @@ import { TrackedAppUsageStat } from '@/types/App'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import ErrorModal from '@/components/ErrorModal'
-import { initialiseBackgroundTask } from '@/utils/utils'
-import * as TaskManager from "expo-task-manager"
-
-TaskManager.getRegisteredTasksAsync().then((tasks) => {
-  console.log(tasks)
-})
-
-let resolver: (() => void) | null
-const promise = new Promise<void>((resolve) => {
-  resolver = resolve
-})
-
-initialiseBackgroundTask(promise)
+import { sendTestNotification } from '@/utils/testNotification'
 
 const Dashboard = () => {
   const today = new Date()
@@ -117,13 +105,6 @@ const Dashboard = () => {
   const handleOpenSettings = () => {
     setShowPermissionModal(false)
   }
-
-  useEffect(() => {
-    if (resolver) {
-      resolver()
-      console.log("resolver called")
-    }
-  }, [])
 
   const ListEmptyComponent = () => (
     <View style={styles.emptyContainer}>

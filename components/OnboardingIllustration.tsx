@@ -4,7 +4,7 @@ import { colors } from '@/constants/colors'
 import Ionicons from "@react-native-vector-icons/ionicons"
 import { typography } from '@/constants/typography'
 import { spacing } from '@/constants/spacing'
-import { OnboardingItem } from '@/app/Onboarding'
+import { OnboardingItem } from '@/app/(onboarding)/Onboarding'
 import { fonts } from '@/constants/fonts'
 
 interface Props {

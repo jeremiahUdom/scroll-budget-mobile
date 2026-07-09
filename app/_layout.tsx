@@ -1,35 +1,48 @@
 import { UserPreferenceProvider, useUserPreference } from '@/context/UserPreferenceContext'
-import { Slot, Redirect } from 'expo-router'
+import { Slot } from 'expo-router'
 import { useEffect } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
+import { registerBackgroundTask } from '@/utils/backgroundTask'
+import { initialiseNotifications } from '@/utils/notificationService'
+import "@/utils/notificationHandler"
 
 SplashScreen.preventAutoHideAsync()
 
 const SplashGate = ({ children }: { children: React.ReactNode }) => {
-  const {isInitialising, hasOnboarded} = useUserPreference()
+  const { isInitialising } = useUserPreference() 
 
   useEffect(() => {
-    // if app has finished initialising hide splash screen
+    const initialiseApp = async () => {
+      try {
+        await initialiseNotifications()
+        await registerBackgroundTask()
+      } catch(error) {
+        console.error(error)
+      }
+    }
+
+    initialiseApp()
+  }, [])
+
+  useEffect(() => {
     if (!isInitialising) {
       SplashScreen.hideAsync()
     }
   }, [isInitialising])
 
-
   if (isInitialising) {
-    // returning null keeps the native splash covering the screen
     return null
   }
 
-  // go to tabs if user has onboarded
-  if (!hasOnboarded) {
-    return <Redirect href="/Onboarding" />
-  }
-
-  return <>{children}</>
+  return (
+    <>
+      {children}
+    </>
+  )
 }
 
 const AppLayout = () => {
+  
   return (
     <UserPreferenceProvider>
       <SplashGate>

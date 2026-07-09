@@ -51,8 +51,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     alignItems: "center",
-    // width: "50%",
-    // backgroundColor: "red",
   },
 
   appIconWrapper: {
