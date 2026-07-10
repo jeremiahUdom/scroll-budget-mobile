@@ -9,8 +9,6 @@ import { notifyBudgetThreshold } from "./notificationService"
 const BACKGROUND_TASK_IDENTIFIER = "CHECK_USAGE_STAT"
 const MINIMUM_INTERVAL = 15
 
-// Thresholds checked from highest to lowest so we never double-fire
-// in a single run (e.g. jumping from 75% -> 95% only notifies once, for 90%).
 const THRESHOLDS = [100, 90, 80] as const
 
 const NOTIFICATION_COPY: Record<(typeof THRESHOLDS)[number], { title: string; body: string }> = {
@@ -99,7 +97,9 @@ TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
 export const registerBackgroundTask = async (
 ) => {
   const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_IDENTIFIER)
+
   if (isRegistered) {
+    console.log("Registered:", isRegistered)
     return
   }
 
