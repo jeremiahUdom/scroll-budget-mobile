@@ -1,4 +1,4 @@
-import { ActivityIndicator, Button, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
@@ -15,7 +15,6 @@ import { TrackedAppUsageStat } from '@/types/App'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import ErrorModal from '@/components/ErrorModal'
-import { sendTestNotification } from '@/utils/testNotification'
 
 const Dashboard = () => {
   const today = new Date()
