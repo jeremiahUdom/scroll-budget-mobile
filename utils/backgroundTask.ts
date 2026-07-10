@@ -99,7 +99,6 @@ export const registerBackgroundTask = async (
   const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_IDENTIFIER)
 
   if (isRegistered) {
-    console.log("Registered:", isRegistered)
     return
   }
 
