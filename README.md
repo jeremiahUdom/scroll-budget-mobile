@@ -1,6 +1,8 @@
 # Scroll Budget
 
-React Native / Expo Android app for Scroll Budget — track time spent on the apps you choose, set daily limits, and view usage insights.
+Scroll Budget is a mobile app that helps users set time budgets for specific apps and tracks their real usage against their budget.
+
+Users pick which installed apps they want to limit, set an hourly budget for each, and get notified when they're approaching or hitting their limit. Everything runs and stores data fully on-device.
 
 ---
 
@@ -10,83 +12,71 @@ React Native / Expo Android app for Scroll Budget — track time spent on the ap
 - **Language:** TypeScript
 - **Charts:** react-native-gifted-charts
 - **Animation:** react-native-svg + react-native-reanimated
-- **Usage tracking:** `@sahil_sensei/react-native-app-usage`
+- **Usage tracking:** Android Usage Stats API via `@sahil_sensei/react-native-app-usage`
+- **Background execution:** `expo-background-task`
+- **Notifications:** `expo-notifications`
+- **Storage:** `@react-native-async-storage/async-storage`
 
 ---
 
-## Prerequisites
+## Features
 
-- Node.js (LTS recommended)
-- Expo CLI (`npm install -g expo-cli` or use `npx expo`)
-- Android device or emulator (Usage Access features require a physical Android device or an emulator with usage-stats support — some emulators don't reliably report usage stats)
-- EAS CLI for builds (`npm install -g eas-cli`)
-- google-services.json
+- **Custom budgets** — Users specify how many hours they want to spend on each selected app.
+- **Installed app detection** — Reads the list of apps installed on the device and lets users choose which ones to track.
+- **Real usage tracking** — Pulls actual usage data via Android's Usage Stats API and displays it on a dashboard against the user's budget.
+- **Background monitoring** — A scheduled background task periodically checks usage against budget thresholds.
+- **Local notifications** — Alerts the user via on-device notifications when they approach or exceed their budget.
 
-## Getting Started
+## Screenshots
 
-1. **Clone the repo**
+### Dashboard
 
-   ```bash
-   git clone https://github.com/jeremiahUdom/scroll-budget-mobile.git
-   cd scroll-budget-mobile
-   ```
+![Dashboard](assets/screenshots/Dashboard.jpg)
 
-2. **Install dependencies**
+### Select Apps
 
-   ```bash
-   npm install
-   ```
+![Select Apps](assets/screenshots/select-apps.jpg)
 
-3. **Run the app**
+### Set Scroll Budget
 
-   ```bash
-   npx expo start
-   ```
-
-   Scan the QR code with Expo Go, or press `a` to launch on a connected Android device/emulator.
-
-   > **Note:** Usage Access tracking relies on a native module (`@sahil_sensei/react-native-app-usage`), which is **not available in Expo Go**. To test tracking end-to-end, build a dev client (see below) rather than relying on Expo Go alone.
+![Set Scroll Budget](assets/screenshots/Set-scroll-budget-1.jpg)
+![Set Scroll Budget](assets/screenshots/Set-scroll-budget.jpg)
 
 ---
 
-## Building for Android
+## Platform Support
 
-This project uses **EAS Build** for producing installable APKs.
+**Android only, by design.** Android exposes the Usage Stats API (`UsageStatsManager`), which this app uses to read per-app usage. This requires an explicit permission grant from the user in system settings, requested in-app.
 
-```bash
-eas build --platform android --profile development
-```
+iOS does not expose equivalent usage data to third-party apps. Apple's Screen Time / DeviceActivity framework is entitlement-gated and does not provide the kind of per-app usage figures this app relies on, so an iOS version isn't currently feasible without a fundamentally different approach.
 
-- `development` profile → generates a debug build with expo-dev-client bundled in, for use with `npx expo start --dev-client` during active development
-- `preview` profile → generates an installable APK for internal testing/dev builds
-- `production` profile → generates an AAB for Play Store submission
+## Known Limitations
 
-Make sure your EAS secrets (env vars, `google-services.json`) are configured via `eas secret:create` or the EAS dashboard before building.
+- **Background check interval is capped at ~15 minutes.** Android's WorkManager (which `expo-background-task` runs on) does not guarantee periodic background execution more frequently than ~15 minutes, regardless of how the task is configured. Real-time, minute-by-minute tracking isn't possible for background checks on Android; the dashboard itself still reflects live usage data whenever the app is open.
+- **Background execution reliability varies by device.** Aggressive battery optimization can delay or skip scheduled checks. .
+- **Not available on iOS**, for the API access reasons above.
 
----
+## Try It Out
 
-## Project Structure
+A signed production APK is available for direct install — no build setup required.
 
-```
-android/            # Native Android project files
-app/                # Expo Router screens (file-based routing)
-assets/             # Images, fonts, and other static assets
-components/         # Reusable UI components
-constants/          # Colors, spacing, typography, fonts
-context/            # Auth & user preference providers
-hooks/              # Shared custom hooks
-scripts/            # One-off / dev scripts
-types/              # Shared TypeScript types
-utils/              # Local storage helpers (tracked apps, preferences)
-```
+📱 **[Download APK](#)** <!-- TODO: add release link, e.g. GitHub Releases or a direct download URL -->
 
----
+Since this app uses native modules (usage stats, background tasks), it won't run in Expo Go — the APK is the fastest way to test it on a real device.
 
-## Known Gotchas
+## Permissions
 
-- **Usage Access permission** can't be requested via a normal runtime dialog — it must be granted manually via Android Settings. Use the library's `hasUsagePermission()` / `openUsagePermissionSettings()` helpers to guide users there.
+On first launch, the app requests:
 
----
+- **Usage Access** (`PACKAGE_USAGE_STATS`) — granted manually via system settings, prompted in-app with instructions
+- **Notifications** — standard runtime permission for local alerts
+
+No account, sign-in, or network permission is required — the app works entirely offline.
+
+## Architecture Notes
+
+- All user data (selected apps, budgets, usage history) is stored locally on-device.
+- The background task runs independently of the UI, checking accumulated usage against saved thresholds and firing local notifications when limits are crossed.
 
 ## License
 

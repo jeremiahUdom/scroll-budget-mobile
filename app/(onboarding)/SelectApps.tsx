@@ -112,7 +112,7 @@ const SelectApps = () => {
     <SafeAreaView style={styles.main}>
       <View style={styles.progress}>
         <View style={styles.steps}>
-          <Text style={styles.stepText}>Step 2 of 2</Text>
+          <Text style={styles.stepText}>Step 1 of 3</Text>
         </View>
 
         <Link style={styles.skipText} href={"/(tabs)"} replace>

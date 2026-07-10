@@ -55,7 +55,7 @@ const AgreeTermsAndPolicies = () => {
         </View>
 
         <Text style={styles.agreement}>
-          By continuing, you agree to our <Text onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)} style={styles.link}>Terms</Text> & <Text onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} style={styles.link}>Privacy Policy</Text>
+          By continuing, you agree to our <Text onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)} style={styles.link}>Terms of Service</Text> & <Text onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} style={styles.link}>Privacy Policy</Text>
         </Text>
       </View>
     </SafeAreaView>
