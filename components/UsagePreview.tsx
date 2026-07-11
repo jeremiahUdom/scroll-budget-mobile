@@ -22,7 +22,7 @@ const UsagePreview = ({
   const percentageUsed = hasBudget
     ? Math.min((budgetUsedInMs / scrollBudgetInMs) * 100, 100)
     : 0;
-    
+
   const radius = 100
   const strokeWidth = 15
   const circumference = 2 * Math.PI * radius
