@@ -29,12 +29,12 @@ const NOTIFICATION_COPY: Record<(typeof THRESHOLDS)[number], { title: string; bo
 export const checkUsage = async () => {
   // check if user has granted permission to view usageStat
   const permission = await hasUsagePermission()
-  
+
   if (!permission) {
     console.log("Usage permission not granted, skipping this run")
     return BackgroundTask.BackgroundTaskResult.Success
   }
-  
+
   // get users tracked apps from async storage
   const myTrackedApps = await getTrackedApps()
 
@@ -43,7 +43,7 @@ export const checkUsage = async () => {
   
   // get user scroll budget from async storage
   const scrollBudget = await getScrollBudget()
-  
+
   // check if getScrolBudget returns a value
   if (!scrollBudget || scrollBudget <= 0) {
     return BackgroundTask.BackgroundTaskResult.Success
@@ -57,7 +57,7 @@ export const checkUsage = async () => {
 
   // computer percentage used
   const percentageUsed = (totalUsage / scrollBudget) * 100
-  
+
   // get notification thresholds
   const notifiedThresholds = await getNotifiedThresholdsForToday()
 
@@ -69,10 +69,16 @@ export const checkUsage = async () => {
 
       await notifyBudgetThreshold(title, body)
 
-      await setNotifiedThresholdsForToday({
-        ...notifiedThresholds,
-        [threshold]: true,
-      })
+      // Mark this threshold and every lower threshold as notified,
+      // so e.g. hitting 90 also marks 80 as already-notified.
+      const updatedThresholds = { ...notifiedThresholds }
+      for (const t of THRESHOLDS) {
+        if (t <= threshold) {
+          updatedThresholds[t] = true
+        }
+      }
+
+      await setNotifiedThresholdsForToday(updatedThresholds)
 
       // Only fire the single highest threshold crossed this run.
       break

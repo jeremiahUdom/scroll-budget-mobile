@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native'
+import { Button, StyleSheet, View } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
@@ -12,7 +12,6 @@ import { IoniconsIconName } from "@react-native-vector-icons/ionicons";
 import OnboardingIllustration from '@/components/OnboardingIllustration'
 import { fonts } from '@/constants/fonts'
 import { Link, useRouter } from 'expo-router'
-
 export interface OnboardingItem {
   title: string
   text: string
