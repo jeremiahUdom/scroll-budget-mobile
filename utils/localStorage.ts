@@ -4,14 +4,21 @@ import { saveData, getData, deleteData } from "./storage"
 const SCROLL_BUDGET_KEY = 'scrollBudgetInMs'
 const TRACKED_APPS_KEY = 'trackedApps'
 const HAS_ONBOARDED_KEY = 'hasOnboarded'
+const SCROLL_BUDGET_LAST_UPDATED_AT_KEY = 'scrollBudgetLastUpdatedAt'
+
+export const setScrollBudgetLastUpdatedAt = async () => 
+  await saveData(SCROLL_BUDGET_LAST_UPDATED_AT_KEY, new Date().toISOString())
+
+export const getScrollBudgetLastUpdatedAt = async () => {
+  const scrollBudgetLastUpdatedAt = await getData<string>(SCROLL_BUDGET_LAST_UPDATED_AT_KEY)
+  return scrollBudgetLastUpdatedAt
+}
 
 export const setHasOnboardedValue = async (value: boolean) => 
-  saveData(HAS_ONBOARDED_KEY, value)
-
+  await saveData(HAS_ONBOARDED_KEY, value)
 
 export const getHasOnboarded = async (): Promise<boolean> => {
   const hasOnboarded = await getData<boolean>(HAS_ONBOARDED_KEY)
-
   return hasOnboarded ?? false
 }
 
@@ -52,4 +59,5 @@ export const removeTrackedApp = async (appPackageName: string) => {
 export const resetUserData = async () => {
   await deleteData(SCROLL_BUDGET_KEY)
   await deleteData(TRACKED_APPS_KEY)
+  await deleteData(HAS_ONBOARDED_KEY)
 }

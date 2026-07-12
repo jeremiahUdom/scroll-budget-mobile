@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { App } from '@/types/App'
-import { getHasOnboarded, getScrollBudget, getTrackedApps, setHasOnboardedValue, setScrollBudget, setTrackedApps } from '@/utils/userPreference'
+import { getHasOnboarded, getScrollBudget, getTrackedApps, setHasOnboardedValue, setScrollBudget, setScrollBudgetLastUpdatedAt, setTrackedApps } from '@/utils/localStorage'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
@@ -51,6 +51,7 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     try {
       setScrollBudgetInMs(budgetInMs)
       await setScrollBudget(budgetInMs)
+      await setScrollBudgetLastUpdatedAt()
 
       return
     } catch (error) {
@@ -62,7 +63,7 @@ export const UserPreferenceProvider = ({ children }: Props) => {
   const updateHasOnboarded = async (value: boolean) => {
     try {
       setHasOnboarded(value)
-      await setHasOnboardedValue(value) // whatever your persistence fn is called in utils/userPreference
+      await setHasOnboardedValue(value)
     } catch (error) {
       console.error("Failed to update onboarding status", error)
       throw new Error("Failed to update onboarding status. Please try again.")

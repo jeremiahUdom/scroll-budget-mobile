@@ -1,256 +1,73 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '@/constants/colors'
 import { spacing } from '@/constants/spacing'
-import { typography } from '@/constants/typography'
+import GoBackBtn from '@/components/GoBackBtn'
+import { useFocusEffect, useRouter } from 'expo-router'
 import { fonts } from '@/constants/fonts'
+import { typography } from '@/constants/typography'
+import { useUserPreference } from '@/context/UserPreferenceContext'
+import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import AppButton from '@/components/AppButton'
-import { updateMyBudget } from '@/api/user.api'
-import { useRouter } from 'expo-router'
-import ErrorModal from '@/components/ErrorModal'
-import * as z from "zod"
-import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
-import GoBackBtn from '@/components/GoBackBtn'
-import { useUserPreference } from '@/context/UserPreferenceContext'
-
-const clamp = (value: number, min: number, max: number) => (
-  Math.min(Math.max(value, min), max)
-)
-
-const hoursSchema = z.object({
-  hours: z.number()
-    .min(0, "Hours can only be between 0 and 24")
-    .max(24, "Hours can only be between 0 and 24")
-})
-
-const minutesSchema = z.object({
-  minutes: z.number()
-    .min(0, "Minutes can only be between 0 and 60")
-    .max(60, "Minutes can only be between 0 and 60")
-})
+import { getScrollBudgetLastUpdatedAt } from '@/utils/localStorage'
 
 const ManageScrollBudget = () => {
   const router = useRouter()
-  const {updateScrollBudget} = useUserPreference()
-  const [loading, setLoading] = useState(false)
-  const [updateError, setUpdateError] = useState("")
-  const [showUpdateError, setShowUpdateError] = useState(false)
-  const [hours, setHours] = useState("0")
-  const [minutes, setMinutes] = useState("0")
-  const [inputError, setInputError] = useState("")
-  const [showInputError, setShowInputError] = useState(false)
+  const { scrollBudgetInMs } = useUserPreference()
+  const [canUpdateBudget, setCanUpdateBudget] = useState(false)
 
-  const increaseHourCounter = () => {
-    const userInput = parseInt(hours)
-
-    const validation = hoursSchema.safeParse({ hours: userInput })
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-
-    setHours(clamp(userInput + 1, 0, 24).toString())
-    return
-  }
-
-  const decreaseHourCounter = () => {
-    const userInput = parseInt(hours)
-    const validation = hoursSchema.safeParse({ hours: userInput })
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-    setHours(clamp(userInput - 1, 0, 24).toString())
-  }
-
-  const increaseMinuteCounter = () => {
-    const userInput = parseInt(minutes)
-    const validation = minutesSchema.safeParse({ minutes: userInput })
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-
-    setMinutes(clamp(userInput + 1, 0, 60).toString())
-    return
-  }
-
-  const decreaseMinuteCounter = () => {
-    const userInput = parseInt(minutes)
-    const validation = minutesSchema.safeParse({ minutes: userInput })
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-
-    setMinutes(clamp(userInput - 1, 0, 60).toString())
-    return
-  }
-
-  const handleHourInputChange = (text: string) => {
-    if (text.trim() === "") {
-      setHours("")
-      return
-    }
-
-    const parsed = parseInt(text, 10)
-    const validation = hoursSchema.safeParse({ hours: parsed })
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-
-    setHours(clamp(parsed, 0, 24).toString())
-  }
-
-  const handleMinuteInputChange = (text: string) => {
-    if (text.trim() === "") {
-      setMinutes("")
-      return
-    }
-
-    const parsed = parseInt(text, 10)
-
-    const validation = minutesSchema.safeParse({ minutes: parsed })
-
-    if (parsed === 60 && parsed <= 60) {
-      const userInput = parseInt(hours)
-      setHours(clamp(userInput + 1, 0, 24).toString())
-      setMinutes("")
-      return
-    }
-
-    if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
-    }
-
-    setMinutes(clamp(parsed, 0, 60).toString())
-  }
-
-  const handleContinue = async () => {
-    setLoading(true)
-    try {
-      // convert the hours and minutes to total minutes
-      const budgetInMinutes = (parseInt(hours) * 60) + parseInt(minutes)
-  
-      // updates the scroll budget in the context
-      await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
-
-      router.replace("/(tabs)/Settings")
-
-      return
-    } catch (error) {
-      console.error("error fetching budget", error)
-      if (error instanceof Error) {
-        setUpdateError(error.message)
-        setShowUpdateError(true)
-        return
+  useFocusEffect(
+    useCallback(() => {
+      const fetchScrollBudgetLastUpdatedAt = async () => {
+        const scrollBudgetLastUpdatedAt = await getScrollBudgetLastUpdatedAt()
+        const today = new Date().toISOString()
+        setCanUpdateBudget(scrollBudgetLastUpdatedAt === today)
       }
 
-      setUpdateError("An error occured while creating your account. Please try again")
-      setShowUpdateError(true)
-      return
-    } finally {
-      setLoading(false)
-    }
-  }
+      fetchScrollBudgetLastUpdatedAt()
+    }, [])
+  )
 
   return (
     <SafeAreaView style={styles.main}>
-      <View style={styles.backBtn}>
+      <View style={styles.backBtnWrapper}>
         <GoBackBtn 
-          onButtonPressed={() => router.replace("/(tabs)/Settings")}
+          onButtonPressed={() => router.replace("/Settings")}
         />
       </View>
 
-      <View style={styles.form}>
-        <Text style={styles.heading}>Set your daily limit</Text>
-        <Text style={styles.supportingText}>This will be your shared daily budget across all apps.</Text>
+      <View style={styles.mainContent}>
+        <View style={styles.scrollBudgetContainer}>
+          <Text style={styles.label}>Your scroll budget</Text>
+          <Text style={styles.scrollBudget}>
+            {formatDurationFromMilliseconds(scrollBudgetInMs)}/day
+          </Text>
+        </View>
 
-        <View style={styles.inputs}>
-          <View style={styles.item}>
-            <Pressable style={styles.control} onPress={increaseHourCounter}>
-              <Ionicons name="chevron-up" size={20} color={colors.darkMuted} />
-            </Pressable>
-
-            <TextInput
-              style={styles.input}
-              value={hours}
-              onChangeText={handleHourInputChange}
-              keyboardType="number-pad"
-            />
-
-            <Pressable style={styles.control} onPress={decreaseHourCounter}>
-              <Ionicons name="chevron-down" size={20} color={colors.darkMuted} />
-            </Pressable>
-
-            <Text style={styles.label}>Hours</Text>
+        <View style={styles.infoCard}>
+          <View style={styles.infoCardTitleContainer}>
+            <Ionicons name="information-circle-outline" size={20} color={colors.darkMuted} />
+            <Text style={styles.infoCardTitle}>Budgets can only change once a day</Text>
           </View>
-
-          <View style={styles.colons}>
-            <View style={styles.colon} />
-            <View style={styles.colon} />
-          </View>
-
-          <View style={styles.item}>
-            <Pressable style={styles.control} onPress={increaseMinuteCounter}>
-              <Ionicons name="chevron-up" size={20} color={colors.darkMuted} />
-            </Pressable>
-
-            <TextInput
-              style={styles.input}
-              value={minutes}
-              onChangeText={handleMinuteInputChange}
-              keyboardType="number-pad"
-            />
-
-            <Pressable style={styles.control} onPress={decreaseMinuteCounter}>
-              <Ionicons name="chevron-down" size={20} color={colors.darkMuted} />
-            </Pressable>
-
-            <Text style={styles.label}>Minutes</Text>
-          </View>
+          <Text style={styles.infoCardSubtitle}>
+            This keeps your limit meaningful. Set it when you&apos;re clear-headed, not mid-scroll.
+          </Text>
         </View>
       </View>
 
-      <AppButton isLoading={loading} onButtonPressed={handleContinue}>
-        Continue
-      </AppButton>
 
-      <ErrorModal 
-        modalVisible={showUpdateError}
-        onCloseModal={() => {
-          setShowUpdateError(false)
-          setUpdateError("")
-        }}
-        error={updateError}
-      />
-
-      <ErrorModal 
-        modalVisible={showInputError}
-        onCloseModal={() => setShowInputError(false)}
-        error={inputError}
-      />
+      {
+        canUpdateBudget ? 
+        <AppButton onButtonPressed={() => router.push("/AccountManagement/ManageScrollBudget")}>
+          UpdateBudget
+        </AppButton>
+        : <View style={styles.lockedMessageContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color={colors.darkMuted} />
+            <Text style={styles.lockedMessage}>Already updated today. Resets at midnight</Text>
+          </View>
+      }
     </SafeAreaView>
   )
 }
@@ -264,77 +81,67 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
 
-  backBtn: {
-    marginBottom: spacing.md,
-  },
-
-  form: {
-    flex: 1,
-  },
-  
-  heading: {
-    fontSize: typography.heading,
-    fontFamily: fonts.bold,
-    color: colors.dark,
-    marginBottom: spacing.md
-  },
-
-  supportingText: {
-    fontSize: typography.body,
-    fontFamily: fonts.regular,
-    color: colors.darkMuted,
-    lineHeight: 24,
+  backBtnWrapper: {
     marginBottom: spacing.lg,
   },
-  
-  inputs: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  
-  item: {
-    borderRadius: 15,
-    alignItems: "center",
-    gap: spacing.md,
+
+  mainContent: {
+    flex: 1,
   },
 
-  control: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderColor: colors.surfaceMuted,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  input: {
-    height: 60,
-    width: 80,
-    alignItems: "center",
-    fontSize: typography.body,
-    fontFamily: fonts.semiBold,
-    textAlign: "center",
-    color: colors.dark,
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 10,
-  },
-
-  colons: {
-    gap: spacing.md,
-    alignItems: "center",
-  },
-
-  colon: {
-    width: 10,
-    height: 10,
-    backgroundColor: colors.surfaceMuted,
+  scrollBudgetContainer: {
+    marginBottom: spacing.lg
   },
 
   label: {
+    textTransform: "uppercase",
+    color: colors.darkMuted,
     fontFamily: fonts.medium,
+    fontSize: typography.small,
+    marginBottom: spacing.xs,
+  },
+
+  scrollBudget: {
+    fontSize: typography.heading,
+    fontFamily: fonts.bold,
+    color: colors.dark
+  },
+
+  infoCard: {
+    width: "100%",
+    paddingVertical: spacing.md,
+    backgroundColor: colors.light,
+    borderRadius: 10,
+    paddingHorizontal: spacing.sm,
+  },
+
+  infoCardTitleContainer: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+
+  infoCardTitle: {
+    fontFamily: fonts.medium,
+    color: colors.darkMuted,
     fontSize: typography.label,
-    color: colors.dark,
+  },
+
+  infoCardSubtitle: {
+    fontFamily: fonts.regular,
+    color: colors.darkMuted,
+    fontSize: typography.label,
+  },
+
+  lockedMessageContainer: {
+    flexDirection: "row",
+    gap: spacing.xs,
+  },
+
+  lockedMessage: {
+    fontFamily: fonts.regular,
+    color: colors.darkMuted,
+    fontSize: typography.label,
+    textAlign: "center",
   }
 })
