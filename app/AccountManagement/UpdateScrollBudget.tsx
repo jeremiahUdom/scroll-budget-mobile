@@ -30,7 +30,7 @@ const minutesSchema = z.object({
     .max(60, "Minutes can only be between 0 and 60")
 })
 
-const SetCustomTime = () => {
+const UpdateScrollBudget = () => {
   const router = useRouter()
   const {updateScrollBudget} = useUserPreference()
   const [loading, setLoading] = useState(false)
@@ -67,7 +67,6 @@ const SetCustomTime = () => {
       setShowInputError(true)
       return
     }
-
     setHours(clamp(userInput - 1, 0, 24).toString())
   }
 
@@ -150,15 +149,17 @@ const SetCustomTime = () => {
   const handleContinue = async () => {
     setLoading(true)
     try {
-      // convert budget to minutes and then to milliseconds
+      // convert the hours and minutes to total minutes
       const budgetInMinutes = (parseInt(hours) * 60) + parseInt(minutes)
-
+  
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
 
-      router.replace("/GetNotified")
+      router.replace("/(tabs)/Settings")
+
       return
     } catch (error) {
+      console.error("error fetching budget", error)
       if (error instanceof Error) {
         setUpdateError(error.message)
         setShowUpdateError(true)
@@ -176,13 +177,14 @@ const SetCustomTime = () => {
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.backBtn}>
-        <GoBackBtn
-          onButtonPressed={() => router.replace("/SetDailyBudget")}
+        <GoBackBtn 
+          onButtonPressed={() => router.replace("/(tabs)/Settings")}
         />
       </View>
+
       <View style={styles.form}>
         <Text style={styles.heading}>Set your daily limit</Text>
-        <Text style={styles.supportingText}>This will be your shared daily budget across all apps. Budgets can only change once a day.</Text>
+        <Text style={styles.supportingText}>This will be your shared daily budget across all apps.</Text>
 
         <View style={styles.inputs}>
           <View style={styles.item}>
@@ -252,7 +254,7 @@ const SetCustomTime = () => {
   )
 }
 
-export default SetCustomTime
+export default UpdateScrollBudget
 
 const styles = StyleSheet.create({
   main: {

@@ -109,7 +109,7 @@ const SetDailyBudget = () => {
 
       <View style={styles.form}>
         <Text style={styles.heading}>How much time do you want to spend on social media daily?</Text>
-        <Text style={styles.supportingText}>This will be your shared daily budget across all apps.</Text>
+        <Text style={styles.supportingText}>This will be your shared daily budget across all apps. Budgets can only change once a day.</Text>
 
         <View>
           <FlatList 

@@ -1,7 +1,7 @@
 import * as BackgroundTask from "expo-background-task"
 import * as TaskManager from "expo-task-manager"
 import { getUsageStatForTrackedApps } from "./getUsageStatForTrackedApps"
-import { getScrollBudget, getTrackedApps } from "./userPreference"
+import { getScrollBudget, getTrackedApps } from "./localStorage"
 import { getNotifiedThresholdsForToday, setNotifiedThresholdsForToday } from "./notification"
 import { hasUsagePermission } from "@sahil_sensei/react-native-app-usage"
 import { notifyBudgetThreshold } from "./notificationService"
