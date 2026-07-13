@@ -31,31 +31,36 @@ const GetNotified = () => {
 
   return (
     <SafeAreaView style={styles.main}>
-      <View style={styles.progress}>
-        <View style={styles.steps}>
-          <Text style={styles.stepText}>Step 3 of 3</Text>
+      <View style={styles.mainContent}>
+        <View style={styles.progress}>
+          <View style={styles.steps}>
+            <Text style={styles.stepText}>Step 3 of 3</Text>
+          </View>
+        </View>
+
+        <View>
+          <Text style={styles.heading}>Know before you scroll too far</Text>
+          <Text style={styles.supportingText}>Turn on notifications so we can nudge you as you get close to your daily limit.</Text>  
+
+          <View style={styles.benefits}>
+            <View style={styles.benefit}>
+              <Ionicons name="warning-outline" size={25} color={colors.darkMuted} />
+              <Text style={styles.text}>A heads up at 80% of your budget</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.infoCard}>
+          <View style={styles.infoCardTitleContainer}>
+            <Ionicons name="bulb-outline" size={20} color={colors.darkMuted} />
+            <Text style={styles.infoCardTitle}>Tip</Text>
+          </View>
+          <Text style={styles.infoCardSubtitle}>
+            Keep Scroll Budget running in the background to receive usage reminders. Force-closing the app may prevent it from monitoring your usage and sending reminders.
+          </Text>
         </View>
       </View>
 
-      <View style={styles.header}>
-        <Text style={styles.heading}>Know before you scroll too far</Text>
-        <Text style={styles.supportingText}>Turn on notifications so we can nudge you as you get close to your daily limit.</Text>  
-
-        <View style={styles.benefits}>
-          <View style={styles.benefit}>
-            <Ionicons name="warning-outline" size={25} color={colors.darkMuted} />
-            <Text style={styles.text}>A heads up at 80% of your budget</Text>
-          </View>
-          <View style={styles.benefit}>
-            <Ionicons name="flame-outline" size={25} color={colors.darkMuted} />
-            <Text style={styles.text}>Streak reminders so you don&apos;t break a good run</Text>
-          </View>
-          <View style={styles.benefit}>
-            <Ionicons name="bar-chart-outline" size={25} color={colors.darkMuted} />
-            <Text style={styles.text}>A weekly recap of your scroll time</Text>
-          </View>
-        </View>
-      </View>
 
       <View>
         <AppButton onButtonPressed={enableNotification}>
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  header: {
+  mainContent: {
     flex: 1,
   },
 
@@ -160,5 +165,33 @@ const styles = StyleSheet.create({
     color: colors.darkMuted,
     fontSize: typography.body,
     marginTop: spacing.lg,
-  }
+  },
+
+  infoCard: {
+    width: "100%",
+    paddingVertical: spacing.md,
+    backgroundColor: colors.primaryMuted,
+    borderRadius: 10,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.lg,
+  },
+
+  infoCardTitleContainer: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+
+  infoCardTitle: {
+    fontFamily: fonts.medium,
+    color: colors.darkMuted,
+    fontSize: typography.label,
+  },
+
+  infoCardSubtitle: {
+    fontFamily: fonts.regular,
+    color: colors.darkMuted,
+    fontSize: typography.label,
+    lineHeight: 22, 
+  },
 })
