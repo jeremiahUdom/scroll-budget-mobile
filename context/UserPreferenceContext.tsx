@@ -1,7 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { App } from '@/types/App'
-import { getHasOnboarded, getScrollBudget, getTrackedApps, setHasOnboardedValue, setScrollBudget, setScrollBudgetLastUpdatedAt, setTrackedApps } from '@/utils/localStorage'
 import { getInstalledApps } from '@sahil_sensei/react-native-app-usage'
+import { getTrackedApps, setTrackedApps } from '@/utils/localDataManager/trackedAppsStorage'
+import { getScrollBudget, setScrollBudget } from '@/utils/localDataManager/scrollBudgetStorage'
+import { getHasOnboarded, setHasOnboardedValue } from '@/utils/localDataManager/hasOnboardedStorage'
+
 type UserPreferenceContextType = {
   scrollBudgetInMs: number
   myTrackedApps: App[]
@@ -51,7 +54,6 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     try {
       setScrollBudgetInMs(budgetInMs)
       await setScrollBudget(budgetInMs)
-      await setScrollBudgetLastUpdatedAt()
 
       return
     } catch (error) {

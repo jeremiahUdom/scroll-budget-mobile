@@ -50,9 +50,6 @@ export default {
         {
           "icon": "./assets/images/notification-icon.png",
           "color": "#FFFFFF",
-          "sounds": [
-            "./assets/sounds/notification.wav"
-          ]
         }
       ]
     ],

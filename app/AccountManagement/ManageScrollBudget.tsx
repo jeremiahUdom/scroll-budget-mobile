@@ -11,7 +11,7 @@ import { useUserPreference } from '@/context/UserPreferenceContext'
 import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
 import Ionicons from '@react-native-vector-icons/ionicons'
 import AppButton from '@/components/AppButton'
-import { getScrollBudgetLastUpdatedAt } from '@/utils/localStorage'
+import { getScrollBudgetLastUpdatedAt } from '@/utils/localDataManager/scrollBudgetStorage'
 
 const ManageScrollBudget = () => {
   const router = useRouter()
