@@ -18,7 +18,6 @@ export default {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.jeremiahudom.scrollbudget",
-      "googleServicesFile": process.env.GOOGLE_SERVICES_JSON,
     },
     "plugins": [
       "expo-router",
