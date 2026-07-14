@@ -23,7 +23,7 @@ const GetNotified = () => {
       return
     } catch (error) {
       console.error("could not enable notifications", error)
-      setError("Coult not enable notifications. Please skip this step or try again")
+      setError("An error occured while enabling notifications. lease try again or skip this step and enble it later from app settings.")
       setShowError(true)
       return
     }

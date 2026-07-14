@@ -12,6 +12,7 @@ import { IoniconsIconName } from "@react-native-vector-icons/ionicons";
 import OnboardingIllustration from '@/components/OnboardingIllustration'
 import { fonts } from '@/constants/fonts'
 import { Link, useRouter } from 'expo-router'
+
 export interface OnboardingItem {
   title: string
   text: string
@@ -93,7 +94,6 @@ const Onboarding = () => {
         }
       </View>
 
-      {/* CONTINUE BUTTON */}
       <View style={styles.ctas}>
         <AppButton onButtonPressed={handleContinue}>
           Continue
