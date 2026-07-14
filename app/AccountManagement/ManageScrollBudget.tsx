@@ -22,6 +22,10 @@ const ManageScrollBudget = () => {
     useCallback(() => {
       const fetchScrollBudgetLastUpdatedAt = async () => {
         const scrollBudgetLastUpdatedAt = await getScrollBudgetLastUpdatedAt()
+        if (!scrollBudgetLastUpdatedAt) {
+          setCanUpdateBudget(true)
+          return
+        }
         const today = new Date().toISOString()
         setCanUpdateBudget(scrollBudgetLastUpdatedAt === today)
       }
@@ -60,7 +64,7 @@ const ManageScrollBudget = () => {
 
       {
         canUpdateBudget ? 
-        <AppButton onButtonPressed={() => router.push("/AccountManagement/ManageScrollBudget")}>
+        <AppButton onButtonPressed={() => router.push("/AccountManagement/UpdateScrollBudget")}>
           UpdateBudget
         </AppButton>
         : <View style={styles.lockedMessageContainer}>

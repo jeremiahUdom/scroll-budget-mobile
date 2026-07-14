@@ -14,6 +14,8 @@ import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
 import GoBackBtn from '@/components/GoBackBtn'
 import { useUserPreference } from '@/context/UserPreferenceContext'
 
+const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000
+
 const clamp = (value: number, min: number, max: number) => (
   Math.min(Math.max(value, min), max)
 )
@@ -28,6 +30,14 @@ const minutesSchema = z.object({
   minutes: z.number()
     .min(0, "Minutes can only be between 0 and 60")
     .max(60, "Minutes can only be between 0 and 60")
+})
+
+const budgetInMsSchema = z.object({
+  budget: z
+    .number()
+    .int('Must be a whole number')
+    .min(1, 'Scroll budget must be atleast 1 minute')
+    .max(TWENTY_FOUR_HOURS_IN_MS, 'Scroll budget cannot exceed 24 hours'),
 })
 
 const UpdateScrollBudget = () => {
@@ -151,6 +161,16 @@ const UpdateScrollBudget = () => {
     try {
       // convert the hours and minutes to total minutes
       const budgetInMinutes = (parseInt(hours) * 60) + parseInt(minutes)
+
+      const validation = budgetInMsSchema.safeParse({
+        budget: budgetInMinutes
+      })
+
+      if (!validation.success) {
+        setUpdateError("Budget must be atleast 1 minute and must not exceed 24hrs")
+        setShowUpdateError(true)
+        return
+      }
   
       // updates the scroll budget in the context
       await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))

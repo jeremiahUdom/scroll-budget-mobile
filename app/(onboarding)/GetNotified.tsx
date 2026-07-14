@@ -77,6 +77,7 @@ const GetNotified = () => {
         onCloseModal={() => {
           setShowError(false)
           setError("")
+          router.push("/(tabs)")
         }}
       />
     </SafeAreaView>
