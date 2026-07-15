@@ -41,8 +41,6 @@ export default {
           ]
         }
       ],
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
       "expo-background-task",
       [
         "expo-notifications",
