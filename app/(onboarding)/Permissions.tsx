@@ -77,7 +77,7 @@ const Permissions = () => {
 
         <Text style={styles.body}>
           To track your usage against the budgets you set, scroll budget needs
-          usage access. This lets it check how long you&aposve spent in the apps
+          usage access. This lets it check how long you&apos;ve spent in the apps
           you choose to track.
         </Text>
 
