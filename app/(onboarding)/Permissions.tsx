@@ -1,16 +1,16 @@
-import AppButton from "@/components/AppButton"
-import { colors } from "@/constants/colors"
-import { fonts } from "@/constants/fonts"
-import { spacing } from "@/constants/spacing"
-import { typography } from "@/constants/typography"
-import { useUserPreference } from "@/context/UserPreferenceContext"
-import Ionicons from "@react-native-vector-icons/ionicons"
+import AppButton from "@/components/AppButton";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { useUserPreference } from "@/context/UserPreferenceContext";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   hasUsagePermission,
   openUsagePermissionSettings,
-} from "@sahil_sensei/react-native-app-usage"
-import { useRouter } from "expo-router"
-import React, { useEffect, useRef } from "react"
+} from "@sahil_sensei/react-native-app-usage";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef } from "react";
 import {
   AppState,
   Image,
@@ -18,43 +18,43 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Permissions = () => {
-  const router = useRouter()
-  const wentToSettings = useRef(false)
-  const { updateHasOnboarded } = useUserPreference()
+  const router = useRouter();
+  const wentToSettings = useRef(false);
+  const { updateHasOnboarded } = useUserPreference();
 
   const grantAccess = async () => {
-    wentToSettings.current = true
-    await openUsagePermissionSettings()
-  }
+    wentToSettings.current = true;
+    await openUsagePermissionSettings();
+  };
 
   const handleSkip = async () => {
     try {
-      await updateHasOnboarded(true)
-      router.replace("/SelectApps")
-      return
+      await updateHasOnboarded(true);
+      router.replace("/SelectApps");
+      return;
     } catch (error) {
-      console.error("Failed to update 'hasOnboarded'", error)
+      console.error("Failed to update 'hasOnboarded'", error);
     }
-  }
+  };
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", async (state) => {
       if (state === "active" && wentToSettings.current) {
-        wentToSettings.current = false
-        const granted = await hasUsagePermission()
+        wentToSettings.current = false;
+        const granted = await hasUsagePermission();
         if (granted) {
-          await updateHasOnboarded(true)
-          router.replace("/SelectApps")
+          await updateHasOnboarded(true);
+          router.replace("/SelectApps");
         }
       }
-    })
+    });
 
-    return () => subscription.remove()
-  }, [router, updateHasOnboarded])
+    return () => subscription.remove();
+  }, [router, updateHasOnboarded]);
 
   return (
     <SafeAreaView style={styles.main}>
@@ -77,8 +77,8 @@ const Permissions = () => {
 
         <Text style={styles.body}>
           To track your usage against the budgets you set, scroll budget needs
-          usage access. This lets it check how long you&apos;ve spent in the apps
-          you choose to track.
+          usage access. This lets it check how long you&apos;ve spent in the
+          apps you choose to track.
         </Text>
 
         <View style={styles.infoCard}>
@@ -102,15 +102,15 @@ const Permissions = () => {
         </Pressable>
 
         <Text style={styles.caption}>
-          You&apos;ll be taken to your device settings. Look for scroll budget in
-          the list and enable access.
+          You&apos;ll be taken to your device settings. Look for scroll budget
+          in the list and enable access.
         </Text>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Permissions
+export default Permissions;
 
 const styles = StyleSheet.create({
   main: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     fontFamily: fonts.regular,
     color: colors.darkMuted,
-    lineHeight: 28,
+    lineHeight: 26,
     marginBottom: spacing.md,
   },
 
@@ -164,12 +164,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMuted,
     borderRadius: 10,
     gap: spacing.xs,
-  },
-
-  infoCardTitle: {
-    fontFamily: fonts.medium,
-    color: colors.darkMuted,
-    fontSize: typography.label,
   },
 
   infoCardSubtitle: {
@@ -184,6 +178,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.darkMuted,
     textAlign: "center",
+    lineHeight: 22,
   },
 
   ctas: {
@@ -196,4 +191,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     textAlign: "center",
   },
-})
+});
