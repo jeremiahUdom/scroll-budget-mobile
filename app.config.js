@@ -1,6 +1,6 @@
 export default {
   "expo": {
-    "name": "scroll-budget",
+    "name": "Scroll Budget",
     "slug": "scroll-budget",
     "version": "1.0.0",
     "orientation": "portrait",
