@@ -1,24 +1,24 @@
-import { Button, StyleSheet, View } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { colors } from '@/constants/colors'
-import AppButton from '@/components/AppButton'
-import { spacing } from '@/constants/spacing'
-import { typography } from '@/constants/typography'
-import { useSharedValue } from "react-native-reanimated";
-import OnboardingIndicator from '@/components/OnboardingIndicator'
-import OnboardingText from '@/components/OnboardingText'
+import AppButton from "@/components/AppButton";
+import OnboardingIllustration from "@/components/OnboardingIllustration";
+import OnboardingIndicator from "@/components/OnboardingIndicator";
+import OnboardingText from "@/components/OnboardingText";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
 import { IoniconsIconName } from "@react-native-vector-icons/ionicons";
-import OnboardingIllustration from '@/components/OnboardingIllustration'
-import { fonts } from '@/constants/fonts'
-import { Link, useRouter } from 'expo-router'
+import { Link, useRouter } from "expo-router";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export interface OnboardingItem {
-  title: string
-  text: string
-  icon: IoniconsIconName
-  color: string
-  iconColor: string
+  title: string;
+  text: string;
+  icon: IoniconsIconName;
+  color: string;
+  iconColor: string;
 }
 
 const ONBOARDING_ITEMS: OnboardingItem[] = [
@@ -37,75 +37,73 @@ const ONBOARDING_ITEMS: OnboardingItem[] = [
     color: colors.dark,
     iconColor: colors.primary,
   },
-  
+
   {
-    title:  "Small habits, big change",
+    title: "Small habits, big change",
     text: "You set the budget. We'll help you stay accountable. One day at a time.",
     icon: "leaf-outline",
     color: colors.primaryDark,
     iconColor: colors.dark,
   },
-]
+];
 
 const Onboarding = () => {
   const router = useRouter();
-  const currentItem = useSharedValue(0)
+  const currentItem = useSharedValue(0);
 
   const handleContinue = () => {
     if (currentItem.value === ONBOARDING_ITEMS.length - 1) {
-      currentItem.value = 0
-      router.replace("/AgreeTermsAndPolicies")
-      return
+      currentItem.value = 0;
+      router.replace("/Permissions");
+      return;
     }
-    currentItem.value += 1
-    return
-  }
+    currentItem.value += 1;
+    return;
+  };
 
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.illustrationContainer}>
-        {
-          ONBOARDING_ITEMS.map((item, _idx) => (
-            <OnboardingIllustration 
-              key={_idx}
-              index={_idx}
-              currentItem={currentItem}
-              content={item}
-            />
-          ))
-        }
+        {ONBOARDING_ITEMS.map((item, _idx) => (
+          <OnboardingIllustration
+            key={_idx}
+            index={_idx}
+            currentItem={currentItem}
+            content={item}
+          />
+        ))}
       </View>
 
       <View style={styles.onboardingTextContainer}>
-        {
-          ONBOARDING_ITEMS.map((item, _idx) => (
-            <OnboardingText key={_idx} index={_idx} currentItem={currentItem}>
-              {item.text}
-            </OnboardingText>
-          ))
-        }
+        {ONBOARDING_ITEMS.map((item, _idx) => (
+          <OnboardingText key={_idx} index={_idx} currentItem={currentItem}>
+            {item.text}
+          </OnboardingText>
+        ))}
       </View>
 
       <View style={styles.indicators}>
-        {
-          ONBOARDING_ITEMS.map((item, _idx) => (
-            <OnboardingIndicator key={_idx} index={_idx} currentItem={currentItem} />
-          ))
-        }
+        {ONBOARDING_ITEMS.map((item, _idx) => (
+          <OnboardingIndicator
+            key={_idx}
+            index={_idx}
+            currentItem={currentItem}
+          />
+        ))}
       </View>
 
       <View style={styles.ctas}>
-        <AppButton onButtonPressed={handleContinue}>
-          Continue
-        </AppButton>
+        <AppButton onButtonPressed={handleContinue}>Continue</AppButton>
 
-        <Link href={"/AgreeTermsAndPolicies"} style={styles.skipText} replace>Skip intro</Link>
+        <Link href={"/Permissions"} style={styles.skipText} replace>
+          Skip intro
+        </Link>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Onboarding
+export default Onboarding;
 
 const styles = StyleSheet.create({
   main: {
@@ -151,6 +149,6 @@ const styles = StyleSheet.create({
     color: colors.darkMuted,
     fontSize: typography.body,
     fontFamily: fonts.medium,
-    textAlign: "center"
-  }
-})
+    textAlign: "center",
+  },
+});

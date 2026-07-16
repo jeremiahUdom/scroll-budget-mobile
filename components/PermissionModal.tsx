@@ -1,10 +1,10 @@
-import { Modal, View, Text, StyleSheet, Pressable } from 'react-native'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import { colors } from '@/constants/colors'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
-import { spacing } from '@/constants/spacing'
-import { openUsagePermissionSettings } from '@sahil_sensei/react-native-app-usage'
+import { colors } from "@/constants/colors"
+import { fonts } from "@/constants/fonts"
+import { spacing } from "@/constants/spacing"
+import { typography } from "@/constants/typography"
+import Ionicons from "@react-native-vector-icons/ionicons"
+import { openUsagePermissionSettings } from "@sahil_sensei/react-native-app-usage"
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native"
 
 interface PermissionModalProps {
   visible: boolean
@@ -12,10 +12,14 @@ interface PermissionModalProps {
   onDismiss: () => void
 }
 
-const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModalProps) => {
-  const handleOpenSettings = () => {
+const PermissionModal = ({
+  visible,
+  onOpenSettings,
+  onDismiss,
+}: PermissionModalProps) => {
+  const handleOpenSettings = async () => {
     onOpenSettings()
-    openUsagePermissionSettings()
+    await openUsagePermissionSettings()
   }
 
   return (
@@ -28,10 +32,7 @@ const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModal
       {/* Dark overlay */}
       <View style={styles.overlay}>
         {/* Pressable overlay to dismiss */}
-        <Pressable
-          style={styles.overlayPress}
-          onPress={onDismiss}
-        />
+        <Pressable style={styles.overlayPress} onPress={onDismiss} />
 
         {/* Modal card */}
         <View style={styles.modal}>
@@ -49,7 +50,8 @@ const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModal
 
           {/* Subtitle */}
           <Text style={styles.subtitle}>
-            Grant permission to see your app usage stats and stay within your daily budget.
+            Grant permission to see your app usage stats and stay within your
+            daily budget.
           </Text>
 
           {/* Buttons container */}
@@ -59,7 +61,7 @@ const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModal
               style={({ pressed }) => [
                 styles.button,
                 styles.primaryButton,
-                pressed && styles.buttonPressed
+                pressed && styles.buttonPressed,
               ]}
               onPress={handleOpenSettings}
             >
@@ -71,7 +73,7 @@ const PermissionModal = ({ visible, onOpenSettings, onDismiss }: PermissionModal
               style={({ pressed }) => [
                 styles.button,
                 styles.secondaryButton,
-                pressed && styles.buttonPressed
+                pressed && styles.buttonPressed,
               ]}
               onPress={onDismiss}
             >
@@ -89,15 +91,15 @@ export default PermissionModal
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   overlayPress: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
   },
 
   modal: {
@@ -105,8 +107,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.lg,
-    alignItems: 'center',
-    width: '85%',
+    alignItems: "center",
+    width: "85%",
     maxWidth: 320,
   },
 
@@ -119,20 +121,20 @@ const styles = StyleSheet.create({
     fontSize: typography.heading,
     color: colors.dark,
     marginBottom: spacing.sm,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   subtitle: {
     fontFamily: fonts.regular,
     fontSize: typography.body,
     color: colors.darkMuted,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: spacing.xl,
     lineHeight: 24,
   },
 
   buttonsContainer: {
-    width: '100%',
+    width: "100%",
     gap: spacing.sm,
   },
 
@@ -140,8 +142,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   primaryButton: {
