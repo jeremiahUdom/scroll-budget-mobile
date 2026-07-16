@@ -3,23 +3,42 @@ import { colors } from "@/constants/colors"
 import { fonts } from "@/constants/fonts"
 import { spacing } from "@/constants/spacing"
 import { typography } from "@/constants/typography"
+import { useUserPreference } from "@/context/UserPreferenceContext"
 import Ionicons from "@react-native-vector-icons/ionicons"
 import {
   hasUsagePermission,
   openUsagePermissionSettings,
 } from "@sahil_sensei/react-native-app-usage"
-import { Link, useRouter } from "expo-router"
+import { useRouter } from "expo-router"
 import React, { useEffect, useRef } from "react"
-import { AppState, Image, StyleSheet, Text, View } from "react-native"
+import {
+  AppState,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Permissions = () => {
   const router = useRouter()
   const wentToSettings = useRef(false)
+  const { updateHasOnboarded } = useUserPreference()
 
   const grantAccess = async () => {
     wentToSettings.current = true
     await openUsagePermissionSettings()
+  }
+
+  const handleSkip = async () => {
+    try {
+      await updateHasOnboarded(true)
+      router.replace("/SelectApps")
+      return
+    } catch (error) {
+      console.error("Failed to update 'hasOnboarded'", error)
+    }
   }
 
   useEffect(() => {
@@ -28,13 +47,14 @@ const Permissions = () => {
         wentToSettings.current = false
         const granted = await hasUsagePermission()
         if (granted) {
-          router.replace("/AgreeTermsAndPolicies")
+          await updateHasOnboarded(true)
+          router.replace("/SelectApps")
         }
       }
     })
 
     return () => subscription.remove()
-  }, [router])
+  }, [router, updateHasOnboarded])
 
   return (
     <SafeAreaView style={styles.main}>
@@ -49,7 +69,9 @@ const Permissions = () => {
               />
             </View>
 
-            <Text style={styles.title}>See how you spend your time</Text>
+            <Text style={styles.title}>
+              Time well spent starts with knowing where it goes.
+            </Text>
           </View>
         </View>
 
@@ -75,13 +97,13 @@ const Permissions = () => {
       <View style={styles.ctas}>
         <AppButton onButtonPressed={grantAccess}>Grant Access</AppButton>
 
-        <Link href={"/AgreeTermsAndPolicies"} style={styles.skipText} replace>
-          Skip
-        </Link>
+        <Pressable onPress={handleSkip}>
+          <Text style={styles.skipText}>Skip</Text>
+        </Pressable>
 
         <Text style={styles.caption}>
-          You&aposll be taken to your device settings. Look for scroll budget
-          in the list and enable access.
+          You&apos;ll be taken to your device settings. Look for scroll budget in
+          the list and enable access.
         </Text>
       </View>
     </SafeAreaView>

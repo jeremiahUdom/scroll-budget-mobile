@@ -1,53 +1,66 @@
-import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
-import React from 'react'
-import { spacing } from '@/constants/spacing'
-import { colors } from '@/constants/colors'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
-import { TrackedAppUsageStat } from '@/types/App'
-import { formatDurationFromMilliseconds } from '@/utils/formatMinutesToTime'
+import { colors } from "@/constants/colors"
+import { fonts } from "@/constants/fonts"
+import { spacing } from "@/constants/spacing"
+import { typography } from "@/constants/typography"
+import { TrackedAppUsageStat } from "@/types/App"
+import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime"
+import React from "react"
+import { Image, StyleSheet, Text, View, ViewStyle } from "react-native"
 
 interface Props {
   scrollBudgetInMs: number
-  app: TrackedAppUsageStat,
+  app: TrackedAppUsageStat
   customStyle?: ViewStyle
   isLoadingUsage?: boolean
 }
 
-const AppUsageCard = ({scrollBudgetInMs, app, customStyle, isLoadingUsage=false}: Props) => {
-  const hasBudget = scrollBudgetInMs > 0;
-  const totalTimeInForeground = formatDurationFromMilliseconds(app.totalTimeInForeground)
-  const budgetUsagePercentage = hasBudget
-    ? Math.round((app.totalTimeInForeground / scrollBudgetInMs) * 100)
-    : 0;
-  const progressWidth = Math.min(
-    budgetUsagePercentage,
-    100
+const AppUsageCard = ({
+  scrollBudgetInMs,
+  app,
+  customStyle,
+  isLoadingUsage = false,
+}: Props) => {
+  const hasBudget = scrollBudgetInMs > 0
+  const totalTimeInForeground = formatDurationFromMilliseconds(
+    app.totalTimeInForeground,
   )
-  
+  const budgetUsagePercentage = hasBudget
+    ? Math.min(
+        Math.round((app.totalTimeInForeground / scrollBudgetInMs) * 100),
+        100,
+      )
+    : 0
+  const progressWidth = Math.min(budgetUsagePercentage, 100)
+
   return (
     <View style={[styles.appUsageCard, customStyle]}>
       <View style={styles.appIconBox}>
-        <Image 
+        <Image
           source={{ uri: app.icon }}
           style={styles.appIcon}
-          resizeMode='contain'
+          resizeMode="contain"
         />
       </View>
       <View style={styles.appInfoContainer}>
-
         <View style={styles.infoItem}>
           <Text style={styles.appTitle}>{app.name}</Text>
-          <Text style={styles.statValue}>{!isLoadingUsage ? totalTimeInForeground : "-"} used</Text>
+          <Text style={styles.statValue}>
+            {!isLoadingUsage ? totalTimeInForeground : "-"} used
+          </Text>
         </View>
 
         <View style={styles.infoItem}>
           <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBarFill, !isLoadingUsage ? { width: `${progressWidth}%` } : null]} />
+            <View
+              style={[
+                styles.progressBarFill,
+                !isLoadingUsage ? { width: `${progressWidth}%` } : null,
+              ]}
+            />
           </View>
-            <Text style={styles.statValue}>
-              { !isLoadingUsage || hasBudget ? `${budgetUsagePercentage}%` : "--"}
-            </Text>
+          <Text style={styles.statValue}>
+            {!isLoadingUsage || hasBudget ? `${budgetUsagePercentage}%` : "--"}
+          </Text>
         </View>
       </View>
     </View>

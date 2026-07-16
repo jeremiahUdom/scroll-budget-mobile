@@ -18,17 +18,17 @@ const UsagePreview = ({
   budgetUsedInMs = 0,
   isDashboardLoading = false
 }: Props) => {
-  const hasBudget = scrollBudgetInMs > 0;
+  const hasBudget = scrollBudgetInMs > 0
   const percentageUsed = hasBudget
     ? Math.min((budgetUsedInMs / scrollBudgetInMs) * 100, 100)
-    : 0;
+    : 0
 
   const radius = 100
   const strokeWidth = 15
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = hasBudget
     ? circumference - (percentageUsed / 100) * circumference
-    : circumference;
+    : circumference
 
   const getBudgetLeft = (scrollBudgetInMs: number, budgetUsedInMs: number) => {
     const budgetLeft = Math.max(scrollBudgetInMs - budgetUsedInMs, 0)

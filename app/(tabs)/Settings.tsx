@@ -1,14 +1,14 @@
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useRouter } from 'expo-router'
-import { colors } from '@/constants/colors'
-import { spacing } from '@/constants/spacing'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
-import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/links'
-import { useUserPreference } from '@/context/UserPreferenceContext'
-import SettingsItem from '@/components/SettingsItem'
+import SettingsItem from "@/components/SettingsItem"
+import { colors } from "@/constants/colors"
+import { fonts } from "@/constants/fonts"
+import { PRIVACY_POLICY_URL } from "@/constants/links"
+import { spacing } from "@/constants/spacing"
+import { typography } from "@/constants/typography"
+import { useUserPreference } from "@/context/UserPreferenceContext"
+import { useRouter } from "expo-router"
+import React from "react"
+import { Linking, ScrollView, StyleSheet, Text, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const Profile = () => {
   const router = useRouter()
@@ -24,21 +24,24 @@ const Profile = () => {
           <View style={styles.items}>
             <SettingsItem
               icon="settings-outline"
-              label='Manage Scroll Budget'
-              description='Set Your Daily Limit' 
-              onItemSelected={() => router.push("/AccountManagement/ManageScrollBudget")}
+              label="Manage Scroll Budget"
+              description="Set Your Daily Limit"
+              onItemSelected={() =>
+                router.push("/AccountManagement/ManageScrollBudget")
+              }
             />
 
             <View style={styles.hr} />
 
             <SettingsItem
               icon="apps-outline"
-              label='Manage Tracked Apps'
+              label="Manage Tracked Apps"
               description={`${myTrackedApps.length} apps tracked`}
-              onItemSelected={() => router.push("/AccountManagement/ManageTrackedApps")}
+              onItemSelected={() =>
+                router.push("/AccountManagement/ManageTrackedApps")
+              }
             />
           </View>
-          
         </View>
 
         <View>
@@ -47,21 +50,24 @@ const Profile = () => {
           <View style={styles.items}>
             <SettingsItem
               icon="shield-outline"
-              label='Privacy Policy'
+              label="Privacy Policy"
               onItemSelected={() => Linking.openURL(PRIVACY_POLICY_URL)}
             />
 
             <View style={styles.hr} />
 
             <SettingsItem
-              icon="document-text-outline"
-              label='Terms of Service'
-              onItemSelected={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+              icon="mail-outline"
+              label="Contact Us"
+              description="ujsprojects@gmail.com"
+              onItemSelected={() =>
+                Linking.openURL("mailto:ujsprojects@gmail.com")
+              }
             />
           </View>
         </View>
 
-        <Text style={styles.version}>Version V 1.0.0</Text>
+        <Text style={styles.version}>Version 1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   )
