@@ -17,7 +17,7 @@ export default {
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.jeremiahudom.scrollbudget",
+      "package": "com.ujs.scrollbudget",
     },
     "plugins": [
       "expo-router",
