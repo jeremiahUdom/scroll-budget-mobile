@@ -1,55 +1,49 @@
-import { UserPreferenceProvider, useUserPreference } from '@/context/UserPreferenceContext'
-import { Slot } from 'expo-router'
-import { useEffect } from 'react'
-import * as SplashScreen from 'expo-splash-screen'
-import { registerBackgroundTask } from '@/utils/backgroundTask'
-import { initialiseNotifications } from '@/utils/notificationService'
-import "@/utils/notificationHandler"
+import {
+  UserPreferenceProvider,
+  useUserPreference,
+} from "@/context/UserPreferenceContext";
+import { registerBackgroundTask } from "@/utils/backgroundTask";
+import "@/utils/notificationHandler";
+import { initialiseNotifications } from "@/utils/notificationService";
+import { Slot } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
-SplashScreen.preventAutoHideAsync()
+SplashScreen.preventAutoHideAsync();
 
 const SplashGate = ({ children }: { children: React.ReactNode }) => {
-  const { isInitialising } = useUserPreference() 
+  const { isInitialising } = useUserPreference();
 
   useEffect(() => {
     const initialiseApp = async () => {
-      try {
-        await initialiseNotifications()
-        await registerBackgroundTask()
-      } catch(error) {
-        console.error(error)
-      }
-    }
+      initialiseNotifications();
+      registerBackgroundTask();
+    };
 
-    initialiseApp()
-  }, [])
+    initialiseApp();
+  }, []);
 
   useEffect(() => {
     if (!isInitialising) {
-      SplashScreen.hideAsync()
+      SplashScreen.hideAsync();
     }
-  }, [isInitialising])
+  }, [isInitialising]);
 
   if (isInitialising) {
-    return null
+    return null;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  )
-}
+  return <>{children}</>;
+};
 
 const AppLayout = () => {
-  
   return (
     <UserPreferenceProvider>
       <SplashGate>
         <Slot />
       </SplashGate>
     </UserPreferenceProvider>
-  )
-}
+  );
+};
 
-export default AppLayout
+export default AppLayout;

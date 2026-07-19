@@ -1,210 +1,215 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { colors } from '@/constants/colors'
-import { spacing } from '@/constants/spacing'
-import { typography } from '@/constants/typography'
-import { fonts } from '@/constants/fonts'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import AppButton from '@/components/AppButton'
-import { useRouter } from 'expo-router'
-import ErrorModal from '@/components/ErrorModal'
-import * as z from "zod"
-import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
-import GoBackBtn from '@/components/GoBackBtn'
-import { useUserPreference } from '@/context/UserPreferenceContext'
+import AppButton from "@/components/AppButton";
+import ErrorModal from "@/components/ErrorModal";
+import GoBackBtn from "@/components/GoBackBtn";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { useUserPreference } from "@/context/UserPreferenceContext";
+import { minutesToMilliseconds } from "@/utils/formatMinutesToTime";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as z from "zod";
 
-const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000
+const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000;
 
-const clamp = (value: number, min: number, max: number) => (
-  Math.min(Math.max(value, min), max)
-)
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
 
 const hoursSchema = z.object({
-  hours: z.number()
+  hours: z
+    .number()
     .min(0, "Hours can only be between 0 and 24")
-    .max(24, "Hours can only be between 0 and 24")
-})
+    .max(24, "Hours can only be between 0 and 24"),
+});
 
 const minutesSchema = z.object({
-  minutes: z.number()
+  minutes: z
+    .number()
     .min(0, "Minutes can only be between 0 and 60")
-    .max(60, "Minutes can only be between 0 and 60")
-})
+    .max(60, "Minutes can only be between 0 and 60"),
+});
 
 const budgetInMsSchema = z.object({
   budget: z
     .number()
-    .int('Must be a whole number')
-    .min(1, 'Scroll budget must be atleast 1 minute')
-    .max(TWENTY_FOUR_HOURS_IN_MS, 'Scroll budget cannot exceed 24 hours'),
-})
+    .int("Must be a whole number")
+    .min(1, "Scroll budget must be atleast 1 minute")
+    .max(TWENTY_FOUR_HOURS_IN_MS, "Scroll budget cannot exceed 24 hours"),
+});
 
 const UpdateScrollBudget = () => {
-  const router = useRouter()
-  const {updateScrollBudget} = useUserPreference()
-  const [loading, setLoading] = useState(false)
-  const [updateError, setUpdateError] = useState("")
-  const [showUpdateError, setShowUpdateError] = useState(false)
-  const [hours, setHours] = useState("0")
-  const [minutes, setMinutes] = useState("0")
-  const [inputError, setInputError] = useState("")
-  const [showInputError, setShowInputError] = useState(false)
+  const router = useRouter();
+  const { updateScrollBudget } = useUserPreference();
+  const [loading, setLoading] = useState(false);
+  const [updateError, setUpdateError] = useState("");
+  const [showUpdateError, setShowUpdateError] = useState(false);
+  const [hours, setHours] = useState("0");
+  const [minutes, setMinutes] = useState("0");
+  const [inputError, setInputError] = useState("");
+  const [showInputError, setShowInputError] = useState(false);
 
   const increaseHourCounter = () => {
-    const userInput = parseInt(hours)
+    const userInput = parseInt(hours);
 
-    const validation = hoursSchema.safeParse({ hours: userInput })
+    const validation = hoursSchema.safeParse({ hours: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
 
-    setHours(clamp(userInput + 1, 0, 24).toString())
-    return
-  }
+    setHours(clamp(userInput + 1, 0, 24).toString());
+    return;
+  };
 
   const decreaseHourCounter = () => {
-    const userInput = parseInt(hours)
-    const validation = hoursSchema.safeParse({ hours: userInput })
+    const userInput = parseInt(hours);
+    const validation = hoursSchema.safeParse({ hours: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
-    setHours(clamp(userInput - 1, 0, 24).toString())
-  }
+    setHours(clamp(userInput - 1, 0, 24).toString());
+  };
 
   const increaseMinuteCounter = () => {
-    const userInput = parseInt(minutes)
-    const validation = minutesSchema.safeParse({ minutes: userInput })
+    const userInput = parseInt(minutes);
+    const validation = minutesSchema.safeParse({ minutes: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
 
-    setMinutes(clamp(userInput + 1, 0, 60).toString())
-    return
-  }
+    setMinutes(clamp(userInput + 1, 0, 60).toString());
+    return;
+  };
 
   const decreaseMinuteCounter = () => {
-    const userInput = parseInt(minutes)
-    const validation = minutesSchema.safeParse({ minutes: userInput })
+    const userInput = parseInt(minutes);
+    const validation = minutesSchema.safeParse({ minutes: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
 
-    setMinutes(clamp(userInput - 1, 0, 60).toString())
-    return
-  }
+    setMinutes(clamp(userInput - 1, 0, 60).toString());
+    return;
+  };
 
   const handleHourInputChange = (text: string) => {
     if (text.trim() === "") {
-      setHours("")
-      return
+      setHours("");
+      return;
     }
 
-    const parsed = parseInt(text, 10)
-    const validation = hoursSchema.safeParse({ hours: parsed })
+    const parsed = parseInt(text, 10);
+    const validation = hoursSchema.safeParse({ hours: parsed });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
 
-    setHours(clamp(parsed, 0, 24).toString())
-  }
+    setHours(clamp(parsed, 0, 24).toString());
+  };
 
   const handleMinuteInputChange = (text: string) => {
     if (text.trim() === "") {
-      setMinutes("")
-      return
+      setMinutes("");
+      return;
     }
 
-    const parsed = parseInt(text, 10)
+    const parsed = parseInt(text, 10);
 
-    const validation = minutesSchema.safeParse({ minutes: parsed })
+    const validation = minutesSchema.safeParse({ minutes: parsed });
 
     if (parsed === 60 && parsed <= 60) {
-      const userInput = parseInt(hours)
-      setHours(clamp(userInput + 1, 0, 24).toString())
-      setMinutes("")
-      return
+      const userInput = parseInt(hours);
+      setHours(clamp(userInput + 1, 0, 24).toString());
+      setMinutes("");
+      return;
     }
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message
-      setInputError(error)
-      setShowInputError(true)
-      return
+      const error = validation.error.issues[0].message;
+      setInputError(error);
+      setShowInputError(true);
+      return;
     }
 
-    setMinutes(clamp(parsed, 0, 60).toString())
-  }
+    setMinutes(clamp(parsed, 0, 60).toString());
+  };
 
   const handleContinue = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // convert the hours and minutes to total minutes
-      const budgetInMinutes = (parseInt(hours) * 60) + parseInt(minutes)
+      const budgetInMinutes = parseInt(hours) * 60 + parseInt(minutes);
 
       const validation = budgetInMsSchema.safeParse({
-        budget: budgetInMinutes
-      })
+        budget: budgetInMinutes,
+      });
 
       if (!validation.success) {
-        setUpdateError("Budget must be atleast 1 minute and must not exceed 24hrs")
-        setShowUpdateError(true)
-        return
+        setUpdateError(
+          "Budget must be atleast 1 minute and must not exceed 24hrs",
+        );
+        setShowUpdateError(true);
+        return;
       }
-  
+
       // updates the scroll budget in the context
-      await updateScrollBudget(minutesToMilliseconds(budgetInMinutes))
+      await updateScrollBudget(minutesToMilliseconds(budgetInMinutes));
 
-      router.replace("/(tabs)/Settings")
+      router.replace("/(tabs)/Settings");
 
-      return
+      return;
     } catch (error) {
-      console.error("error fetching budget", error)
+      console.error("error fetching budget", error);
       if (error instanceof Error) {
-        setUpdateError(error.message)
-        setShowUpdateError(true)
-        return
+        setUpdateError(error.message);
+        setShowUpdateError(true);
+        return;
       }
 
-      setUpdateError("An error occured while creating your account. Please try again")
-      setShowUpdateError(true)
-      return
+      setUpdateError(
+        "An error occured while creating your account. Please try again",
+      );
+      setShowUpdateError(true);
+      return;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.backBtn}>
-        <GoBackBtn 
-          onButtonPressed={() => router.replace("/(tabs)/Settings")}
-        />
+        <GoBackBtn onButtonPressed={() => router.replace("/(tabs)/Settings")} />
       </View>
 
       <View style={styles.form}>
         <Text style={styles.heading}>Set your daily limit</Text>
-        <Text style={styles.supportingText}>This will be your shared daily budget across all apps.</Text>
+        <Text style={styles.supportingText}>
+          This will be your shared daily budget across all apps.
+        </Text>
 
         <View style={styles.inputs}>
           <View style={styles.item}>
@@ -220,7 +225,11 @@ const UpdateScrollBudget = () => {
             />
 
             <Pressable style={styles.control} onPress={decreaseHourCounter}>
-              <Ionicons name="chevron-down" size={20} color={colors.darkMuted} />
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={colors.darkMuted}
+              />
             </Pressable>
 
             <Text style={styles.label}>Hours</Text>
@@ -244,7 +253,11 @@ const UpdateScrollBudget = () => {
             />
 
             <Pressable style={styles.control} onPress={decreaseMinuteCounter}>
-              <Ionicons name="chevron-down" size={20} color={colors.darkMuted} />
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={colors.darkMuted}
+              />
             </Pressable>
 
             <Text style={styles.label}>Minutes</Text>
@@ -256,25 +269,25 @@ const UpdateScrollBudget = () => {
         Continue
       </AppButton>
 
-      <ErrorModal 
+      <ErrorModal
         modalVisible={showUpdateError}
         onCloseModal={() => {
-          setShowUpdateError(false)
-          setUpdateError("")
+          setShowUpdateError(false);
+          setUpdateError("");
         }}
         error={updateError}
       />
 
-      <ErrorModal 
+      <ErrorModal
         modalVisible={showInputError}
         onCloseModal={() => setShowInputError(false)}
         error={inputError}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default UpdateScrollBudget
+export default UpdateScrollBudget;
 
 const styles = StyleSheet.create({
   main: {
@@ -290,12 +303,12 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
   },
-  
+
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
     color: colors.dark,
-    marginBottom: spacing.md
+    marginBottom: spacing.md,
   },
 
   supportingText: {
@@ -305,13 +318,13 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
-  
+
   inputs: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
   },
-  
+
   item: {
     borderRadius: 15,
     alignItems: "center",
@@ -355,5 +368,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     fontSize: typography.label,
     color: colors.dark,
-  }
-})
+  },
+});

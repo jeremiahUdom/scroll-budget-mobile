@@ -1,44 +1,44 @@
-import { Image, StyleSheet, Switch, Text, View } from 'react-native'
-import React from 'react'
-import { colors } from '@/constants/colors'
-import { App } from '@/types/App'
-import { spacing } from '@/constants/spacing'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { App } from "@/types/App";
+import React from "react";
+import { Image, StyleSheet, Switch, Text, View } from "react-native";
 interface Props {
-  item: App
-  onSelected: (packageName: string) => void
-  appSelected?: boolean
+  item: App;
+  onSelected: (app: App) => void;
+  appSelected?: boolean;
 }
 
-const AppItem = ({item, onSelected, appSelected=false}: Props) => {
+const AppItem = ({ item, onSelected, appSelected = false }: Props) => {
   const toggleSwitch = () => {
-    onSelected(item.packageName)
-  }
+    onSelected(item);
+  };
 
   return (
     <View style={styles.listItem}>
       <View style={styles.appData}>
         <View style={styles.appIconWrapper}>
           <Image
-            source={{uri: item.icon}}
+            source={{ uri: item.icon }}
             style={styles.appIcon}
-            resizeMode='contain'
+            resizeMode="contain"
           />
         </View>
         <Text style={styles.appName}>{item.name}</Text>
       </View>
       <Switch
         trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
-        thumbColor={ appSelected ? colors.primaryMuted : colors.darkMuted }
+        thumbColor={appSelected ? colors.primaryMuted : colors.darkMuted}
         onValueChange={toggleSwitch}
         value={appSelected}
       />
     </View>
-  )
-}
+  );
+};
 
-export default AppItem
+export default AppItem;
 
 const styles = StyleSheet.create({
   listItem: {
@@ -74,4 +74,4 @@ const styles = StyleSheet.create({
     color: colors.dark,
     width: 180,
   },
-})
+});

@@ -1,28 +1,28 @@
-import AppUsageCard from "@/components/AppUsageCard"
-import ErrorModal from "@/components/ErrorModal"
-import PermissionModal from "@/components/PermissionModal"
-import UsagePreview from "@/components/UsagePreview"
-import { colors } from "@/constants/colors"
-import { fonts } from "@/constants/fonts"
-import { spacing } from "@/constants/spacing"
-import { typography } from "@/constants/typography"
-import { useUserPreference } from "@/context/UserPreferenceContext"
-import { TrackedAppUsageStat } from "@/types/App"
-import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime"
-import Ionicons from "@react-native-vector-icons/ionicons"
+import AppUsageCard from "@/components/AppUsageCard";
+import ErrorModal from "@/components/ErrorModal";
+import PermissionModal from "@/components/PermissionModal";
+import UsagePreview from "@/components/UsagePreview";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { useUserPreference } from "@/context/UserPreferenceContext";
+import { TrackedAppUsageStat } from "@/types/App";
+import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   getHourlyUsage,
   hasUsagePermission,
   openUsagePermissionSettings,
-} from "@sahil_sensei/react-native-app-usage"
-import { Link, useFocusEffect } from "expo-router"
+} from "@sahil_sensei/react-native-app-usage";
+import { Link } from "expo-router";
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react"
+} from "react";
 import {
   ActivityIndicator,
   AppState,
@@ -31,113 +31,114 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Dashboard = () => {
-  const today = new Date()
-  const { scrollBudgetInMs, myTrackedApps } = useUserPreference()
-  const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([])
+  const today = new Date();
+  const { scrollBudgetInMs, myTrackedApps } = useUserPreference();
+  const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([]);
   const [hasPermissionToViewUsageStats, setHasPermissionToViewUsageStats] =
-    useState(false)
-  const [showPermissionModal, setShowPermissionModal] = useState(false)
-  const [loadingUsage, setLoadingUsage] = useState(true)
-  const [error, setError] = useState("")
-  const [showError, setShowError] = useState(false)
-  const wentToSettings = useRef(false)
+    useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(true);
+  const [loadingUsage, setLoadingUsage] = useState(false);
+  const [error, setError] = useState("");
+  const [showError, setShowError] = useState(false);
+  const wentToSettings = useRef(false);
 
-  const isInitialLoad = usageStats.length === 0
+  const isInitialLoad = usageStats.length === 0;
+
+  const checkPermission = useCallback(async () => {
+    const permission = await hasUsagePermission();
+    setHasPermissionToViewUsageStats(permission);
+  }, []);
 
   const loadDashboard = useCallback(async () => {
     try {
-      setLoadingUsage(true)
-      // 1. Check if user has granted permission for the app to view usage stats
-      const permission = await hasUsagePermission()
-      setHasPermissionToViewUsageStats(permission)
+      setLoadingUsage(true);
 
-      if (!permission) {
-        setShowPermissionModal(true)
-        setLoadingUsage(false)
-        return
+      if (myTrackedApps.length === 0) {
+        return;
       }
 
-      // 3. Get usage stats from Android API
+      // make only one API Call to fetch everything. i will fix this by writing the native code to fetch usage stats by myself using expo native modules
       const usageStats = (
         await Promise.all(
           myTrackedApps.map(async (app) => {
             const totalTimeInForeground = (
               await getHourlyUsage(app.packageName)
-            ).reduce((sum, hour) => sum + hour.durationMs, 0)
+            ).reduce((sum, hour) => sum + hour.durationMs, 0);
 
             return {
               ...app,
               totalTimeInForeground,
-            }
+            };
           }),
         )
-      ).sort((a, b) => b.totalTimeInForeground - a.totalTimeInForeground)
+      ).sort((a, b) => b.totalTimeInForeground - a.totalTimeInForeground);
 
-      setUsageStats(usageStats)
+      setUsageStats(usageStats);
     } catch (error) {
-      console.error("Dashboard load error:", error)
+      console.error("Dashboard load error:", error);
       if (error instanceof Error) {
-        setError(error.message)
-        setShowError(true)
-        return
+        setError(error.message);
+        setShowError(true);
+        return;
       }
 
       setError(
         "An error occured while loading your dashboard. Please try again",
-      )
-      setShowError(true)
-      return
+      );
+      setShowError(true);
+      return;
     } finally {
-      setLoadingUsage(false)
+      setLoadingUsage(false);
     }
-  }, [myTrackedApps])
+  }, [myTrackedApps]);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadDashboard()
-    }, [loadDashboard]),
-  )
-
-  // Re-check permission when the user returns from the OS Settings screen
+  // check app state
   useEffect(() => {
     const subscription = AppState.addEventListener("change", async (state) => {
       if (state === "active" && wentToSettings.current) {
-        wentToSettings.current = false
-        const granted = await hasUsagePermission()
-        setHasPermissionToViewUsageStats(granted)
-        if (granted) {
-          setShowPermissionModal(false)
-          loadDashboard()
-        }
+        wentToSettings.current = false;
+        await checkPermission();
       }
-    })
+    });
 
-    return () => subscription.remove()
-  }, [loadDashboard])
+    return () => subscription.remove();
+  }, [checkPermission]);
+
+  useEffect(() => {
+    if (hasPermissionToViewUsageStats) {
+      void loadDashboard();
+      setShowPermissionModal(false);
+      return;
+    }
+  }, [hasPermissionToViewUsageStats, loadDashboard]);
+
+  useEffect(() => {
+    checkPermission();
+  }, [checkPermission]);
 
   // Calculate total usage in milliseconds for all tracked apps
   const totalUsageInMs = useMemo(
     () => usageStats.reduce((sum, app) => sum + app.totalTimeInForeground, 0),
     [usageStats],
-  )
+  );
 
   const handlePermissionModalDismiss = () => {
-    setShowPermissionModal(false)
-  }
+    setShowPermissionModal(false);
+  };
 
   const handleOpenSettings = () => {
-    wentToSettings.current = true
-    setShowPermissionModal(false)
-  }
+    wentToSettings.current = true;
+    setShowPermissionModal(false);
+  };
 
   const handleEnablePress = () => {
-    wentToSettings.current = true
-    openUsagePermissionSettings()
-  }
+    wentToSettings.current = true;
+    openUsagePermissionSettings();
+  };
 
   const ListEmptyComponent = () => (
     <View style={styles.emptyContainer}>
@@ -149,7 +150,7 @@ const Dashboard = () => {
         </Text>
       </View>
     </View>
-  )
+  );
 
   return (
     <SafeAreaView style={styles.main}>
@@ -234,10 +235,10 @@ const Dashboard = () => {
         error={error}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
 
 const styles = StyleSheet.create({
   main: {
@@ -363,4 +364,4 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: colors.surfaceMuted,
   },
-})
+});

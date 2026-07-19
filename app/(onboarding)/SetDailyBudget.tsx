@@ -1,99 +1,101 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { colors } from '@/constants/colors'
-import { spacing } from '@/constants/spacing'
-import { typography } from '@/constants/typography'
-import { fonts } from '@/constants/fonts'
-import ErrorModal from '@/components/ErrorModal'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import { Link, useRouter } from 'expo-router'
-import AppButton from '@/components/AppButton'
-import { minutesToMilliseconds } from '@/utils/formatMinutesToTime'
-import { useUserPreference } from '@/context/UserPreferenceContext'
+import AppButton from "@/components/AppButton";
+import ErrorModal from "@/components/ErrorModal";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { useUserPreference } from "@/context/UserPreferenceContext";
+import { minutesToMilliseconds } from "@/utils/formatMinutesToTime";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Item = {
-  label: string
-  value: number
-  type: "hours" | "minutes"
-}
+  label: string;
+  value: number;
+  type: "hours" | "minutes";
+};
 
 const PRESET: Item[] = [
   {
     label: "15 min",
     value: 15,
-    type: "minutes"
-  }, 
+    type: "minutes",
+  },
 
   {
     label: "30 min",
     value: 30,
-    type: "minutes"
-  }, 
+    type: "minutes",
+  },
 
   {
     label: "1 hr",
     value: 60,
-    type: "hours"
-  }, 
+    type: "hours",
+  },
 
   {
     label: "2 hrs",
     value: 120,
-    type: "hours"
-  }, 
+    type: "hours",
+  },
 
   {
     label: "Custom",
     value: 0,
-    type: "minutes"
+    type: "minutes",
   },
-]
+];
 
 const SetDailyBudget = () => {
-  const router = useRouter()
-  const {updateScrollBudget} = useUserPreference()
-  const [loading, setLoading] = useState(false)
-  const [updateError, setUpdateError] = useState("")
-  const [showUpdateError, setShowUpdateError] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<number>(0)
+  const router = useRouter();
+  const { updateScrollBudget } = useUserPreference();
+  const [loading, setLoading] = useState(false);
+  const [updateError, setUpdateError] = useState("");
+  const [showUpdateError, setShowUpdateError] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<number>(0);
 
   const handleSelected = (item: Item, index: number) => {
     if (index === PRESET.length - 1) {
-      router.push("/(onboarding)/SetCustomTime")
-      return
+      router.push("/(onboarding)/SetCustomTime");
+      return;
     }
 
-    setSelectedItem(item.value)
-    return
-  }
+    setSelectedItem(item.value);
+    return;
+  };
 
   const handleContinue = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       if (!selectedItem) {
-        return
+        return;
       }
 
       // updates the scroll budget in the context
-      await updateScrollBudget(minutesToMilliseconds(selectedItem))
+      await updateScrollBudget(minutesToMilliseconds(selectedItem));
 
-      router.replace("/(onboarding)/GetNotified")
-      return
+      router.replace("/(onboarding)/GetNotified");
+      return;
     } catch (error) {
       if (error instanceof Error) {
-        setUpdateError(error.message)
-        setShowUpdateError(true)
-        return
+        setUpdateError(error.message);
+        setShowUpdateError(true);
+        return;
       }
 
-      setUpdateError("An error occured while creating your account. Please try again")
-      setShowUpdateError(true)
-      return
+      setUpdateError(
+        "An error occured while creating your account. Please try again",
+      );
+      setShowUpdateError(true);
+      return;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.main}>
@@ -108,19 +110,31 @@ const SetDailyBudget = () => {
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.heading}>How much time do you want to spend on social media daily?</Text>
-        <Text style={styles.supportingText}>This will be your shared daily budget across all apps. Budgets can only change once a day.</Text>
+        <Text style={styles.heading}>
+          How much time do you want to spend on social media daily?
+        </Text>
+        <Text style={styles.supportingText}>
+          This will be your shared daily budget across all apps. Budgets can
+          only change once a day.
+        </Text>
 
         <View>
-          <FlatList 
+          <FlatList
             data={PRESET}
             keyExtractor={(item, _idx) => _idx.toString()}
-            renderItem={({item, index}) => (
-              <Pressable 
-                onPress={() => handleSelected(item, index)} 
-                style={[styles.listItem, selectedItem === item.value ? styles.itemSelected : {}]}
+            renderItem={({ item, index }) => (
+              <Pressable
+                onPress={() => handleSelected(item, index)}
+                style={[
+                  styles.listItem,
+                  selectedItem === item.value ? styles.itemSelected : {},
+                ]}
               >
-                <Ionicons name={index === PRESET.length - 1 ? "add" : "time-outline" } size={20} color={colors.primary} />
+                <Ionicons
+                  name={index === PRESET.length - 1 ? "add" : "time-outline"}
+                  size={20}
+                  color={colors.primary}
+                />
                 <Text style={styles.text}>{item.label}</Text>
               </Pressable>
             )}
@@ -133,16 +147,16 @@ const SetDailyBudget = () => {
         Continue
       </AppButton>
 
-      <ErrorModal 
+      <ErrorModal
         modalVisible={showUpdateError}
         onCloseModal={() => setShowUpdateError(false)}
         error={updateError}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default SetDailyBudget
+export default SetDailyBudget;
 
 const styles = StyleSheet.create({
   main: {
@@ -165,7 +179,7 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted, 
+    backgroundColor: colors.primaryMuted,
     borderRadius: 30,
   },
 
@@ -225,5 +239,5 @@ const styles = StyleSheet.create({
 
   itemSelected: {
     backgroundColor: colors.primaryMuted,
-  }
-})
+  },
+});

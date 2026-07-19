@@ -1,12 +1,12 @@
-import { colors } from '@/constants/colors'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import { Tabs } from 'expo-router'
-import React from 'react'
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { typography } from "@/constants/typography";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { Tabs } from "expo-router";
+import React from "react";
 
 export default function TabLayout() {
-  return (     
+  return (
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -27,31 +27,33 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name='index' 
+      <Tabs.Screen
+        name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({color, size, focused}) => (
-            <Ionicons 
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
               name={focused ? "home" : "home-outline"}
               size={20}
               color={color}
             />
-          )
-        }} 
+          ),
+        }}
       />
 
-      <Tabs.Screen name='Settings' 
+      <Tabs.Screen
+        name="Settings"
         options={{
           title: "Settings",
-          tabBarIcon: ({color, size, focused}) => (
-            <Ionicons 
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
               name={focused ? "settings" : "settings-outline"}
               size={20}
               color={color}
             />
-          )
-        }} 
+          ),
+        }}
       />
     </Tabs>
-  )
+  );
 }

@@ -1,33 +1,35 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { colors } from '@/constants/colors'
-import { spacing } from '@/constants/spacing'
-import { typography } from '@/constants/typography'
-import { fonts } from '@/constants/fonts'
-import { useRouter } from 'expo-router'
-import { requestNotificationsPermission } from '@/utils/notificationService'
-import ErrorModal from '@/components/ErrorModal'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import AppButton from '@/components/AppButton'
+import AppButton from "@/components/AppButton";
+import ErrorModal from "@/components/ErrorModal";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { requestNotificationsPermission } from "@/utils/notificationService";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const GetNotified = () => {
-  const router = useRouter()
-  const [error, setError] = useState("")
-  const [showError, setShowError] = useState(false)
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const enableNotification = async () => {
     try {
-      await requestNotificationsPermission()
-      router.replace("/(tabs)") 
-      return
+      await requestNotificationsPermission();
+      router.replace("/(tabs)");
+      return;
     } catch (error) {
-      console.error("could not enable notifications", error)
-      setError("An error occured while enabling notifications. lease try again or skip this step and enble it later from app settings.")
-      setShowError(true)
-      return
+      console.error("could not enable notifications", error);
+      setError(
+        "An error occured while enabling notifications. lease try again or skip this step and enble it later from app settings.",
+      );
+      setShowError(true);
+      return;
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.main}>
@@ -40,11 +42,18 @@ const GetNotified = () => {
 
         <View>
           <Text style={styles.heading}>Know before you scroll too far</Text>
-          <Text style={styles.supportingText}>Turn on notifications so we can nudge you as you get close to your daily limit.</Text>  
+          <Text style={styles.supportingText}>
+            Turn on notifications so we can nudge you as you get close to your
+            daily limit.
+          </Text>
 
           <View style={styles.benefits}>
             <View style={styles.benefit}>
-              <Ionicons name="warning-outline" size={25} color={colors.darkMuted} />
+              <Ionicons
+                name="warning-outline"
+                size={25}
+                color={colors.darkMuted}
+              />
               <Text style={styles.text}>A heads up at 80% of your budget</Text>
             </View>
           </View>
@@ -56,11 +65,12 @@ const GetNotified = () => {
             <Text style={styles.infoCardTitle}>Tip</Text>
           </View>
           <Text style={styles.infoCardSubtitle}>
-            Keep Scroll Budget running in the background to receive usage reminders. Force-closing the app may prevent it from monitoring your usage and sending reminders.
+            Keep Scroll Budget running in the background to receive usage
+            reminders. Force-closing the app may prevent it from monitoring your
+            usage and sending reminders.
           </Text>
         </View>
       </View>
-
 
       <View>
         <AppButton onButtonPressed={enableNotification}>
@@ -71,20 +81,20 @@ const GetNotified = () => {
         </Pressable>
       </View>
 
-      <ErrorModal 
+      <ErrorModal
         modalVisible={showError}
         error={error}
         onCloseModal={() => {
-          setShowError(false)
-          setError("")
-          router.push("/(tabs)")
+          setShowError(false);
+          setError("");
+          router.push("/(tabs)");
         }}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default GetNotified
+export default GetNotified;
 
 const styles = StyleSheet.create({
   main: {
@@ -107,7 +117,7 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted, 
+    backgroundColor: colors.primaryMuted,
     borderRadius: 30,
   },
 
@@ -157,7 +167,7 @@ const styles = StyleSheet.create({
     fontSize: typography.caption,
     color: colors.darkMuted,
     fontFamily: fonts.regular,
-    maxWidth: 250
+    maxWidth: 250,
   },
 
   notNow: {
@@ -193,6 +203,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.darkMuted,
     fontSize: typography.label,
-    lineHeight: 22, 
+    lineHeight: 22,
   },
-})
+});

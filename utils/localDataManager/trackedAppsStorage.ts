@@ -1,25 +1,31 @@
-import { TRACKED_APPS_KEY } from "./localStorage"
-import { getData, saveData } from "../storage"
+import { App } from "@/types/App";
+import { getData, saveData } from "../storage";
+import { TRACKED_APPS_KEY } from "./localStorage";
 
-export const setTrackedApps = (apps: string[]) => 
-  saveData(TRACKED_APPS_KEY, apps)
+export const setTrackedApps = (apps: App[]) => saveData(TRACKED_APPS_KEY, apps);
 
-export const getTrackedApps = async (): Promise<string[]> => {
-  const apps = await getData<string[]>(TRACKED_APPS_KEY)
-  return apps ?? []
-}
+export const getTrackedApps = async (): Promise<App[]> => {
+  const apps = await getData<App[]>(TRACKED_APPS_KEY);
+  return apps ?? [];
+};
 
-export const addTrackedApp = async (appPackageName: string) => {
-  const current = await getTrackedApps()
+export const addTrackedApp = async (app: App) => {
+  const currentTrackedApps = await getTrackedApps();
+  const newAppIndex = currentTrackedApps.findIndex(
+    (item) => item.packageName === app.packageName,
+  );
 
-  if (current.includes(appPackageName)) {
-    return
+  if (newAppIndex === -1) {
+    return;
   }
 
-  return setTrackedApps([...current, appPackageName])
-}
+  return setTrackedApps([...currentTrackedApps, app]);
+};
 
 export const removeTrackedApp = async (appPackageName: string) => {
-  const current = await getTrackedApps()
-  return setTrackedApps(current.filter((app: string) => app !== appPackageName))
-}
+  const current = await getTrackedApps();
+
+  return await setTrackedApps(
+    current.filter((app) => app.packageName !== appPackageName),
+  );
+};

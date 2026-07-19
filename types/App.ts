@@ -1,20 +1,9 @@
-export type App = {
-  icon: string
-  iconHash: string
-  name: string
-  packageName: string
-  uid: string
-  versionCode: number
-  versionName: string
+export interface App {
+  name: string;
+  packageName: string;
+  icon: string;
 }
 
-export type TrackedAppUsageStat = {
-  icon: string
-  iconHash: string
-  name: string
-  packageName: string
-  totalTimeInForeground: number
-  uid: string
-  versionCode: number
-  versionName: string
+export interface TrackedAppUsageStat extends App {
+  totalTimeInForeground: number;
 }
