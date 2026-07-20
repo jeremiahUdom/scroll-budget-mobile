@@ -44,34 +44,20 @@ const SelectApps = () => {
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: App }) => (
-      <AppItem
-        item={item}
-        onSelected={handleSelected}
-        appSelected={selectedSet.has(item.packageName)}
-      />
-    ),
+    ({ item }: { item: App }) => {
+      const isSelected = selectedSet.has(item.packageName);
+      return (
+        <AppItem
+          item={item}
+          onSelected={handleSelected}
+          appSelected={isSelected}
+        />
+      );
+    },
     [handleSelected, selectedSet],
   );
 
   const keyExtractor = useCallback((item: App) => item.packageName, []);
-
-  const ListHeader = useCallback(
-    () => <Text style={styles.caption}>Scroll down to see all apps</Text>,
-    [],
-  );
-
-  const ListEmptyComponent = useCallback(
-    () => (
-      <View>
-        <Text style={styles.emptyStateTitle}>No Apps Found</Text>
-        <Text style={styles.emptyStateText}>
-          It looks like you don&apos;t have any apps installed yet
-        </Text>
-      </View>
-    ),
-    [],
-  );
 
   // runs immediately the screen is focused
   useFocusEffect(
@@ -87,10 +73,10 @@ const SelectApps = () => {
             icon: app.icon,
           }));
           setApps(apps);
+          setisFetchingUserInstalledApps(false);
           return;
         } catch (error) {
           console.error("Dashboard load error:", error);
-        } finally {
           setisFetchingUserInstalledApps(false);
         }
       };
@@ -113,21 +99,20 @@ const SelectApps = () => {
 
       router.replace("/SetDailyBudget");
 
+      setLoading(false);
+
       return;
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-        setShowError(true);
-        return;
-      }
-
+      console.error(
+        "An error occured while trying to save your selected apps.",
+        error,
+      );
       setError(
-        "An error occured while creating your account. Please try again",
+        "An error occured while trying to save your selected apps. Please try again",
       );
       setShowError(true);
-      return;
-    } finally {
       setLoading(false);
+      return;
     }
   };
 
@@ -161,11 +146,17 @@ const SelectApps = () => {
               data={apps}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
-              ListHeaderComponent={apps.length !== 0 ? ListHeader : null}
               initialNumToRender={12}
               maxToRenderPerBatch={12}
               windowSize={7}
-              ListEmptyComponent={ListEmptyComponent}
+              ListEmptyComponent={
+                <View>
+                  <Text style={styles.emptyStateTitle}>No Apps Found</Text>
+                  <Text style={styles.emptyStateText}>
+                    It looks like you don&apos;t have any apps installed yet
+                  </Text>
+                </View>
+              }
             />
           ) : (
             <ActivityIndicator size={"large"} color={colors.primary} />

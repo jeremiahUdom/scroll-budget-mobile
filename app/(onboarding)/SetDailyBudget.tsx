@@ -13,6 +13,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Item = {
+  id: string;
   label: string;
   value: number;
   type: "hours" | "minutes";
@@ -20,30 +21,35 @@ type Item = {
 
 const PRESET: Item[] = [
   {
+    id: "15",
     label: "15 min",
     value: 15,
     type: "minutes",
   },
 
   {
+    id: "30",
     label: "30 min",
     value: 30,
     type: "minutes",
   },
 
   {
+    id: "60",
     label: "1 hr",
     value: 60,
     type: "hours",
   },
 
   {
+    id: "120",
     label: "2 hrs",
     value: 120,
     type: "hours",
   },
 
   {
+    id: "0",
     label: "Custom",
     value: 0,
     type: "minutes",
@@ -56,44 +62,44 @@ const SetDailyBudget = () => {
   const [loading, setLoading] = useState(false);
   const [updateError, setUpdateError] = useState("");
   const [showUpdateError, setShowUpdateError] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<number>(0);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-  const handleSelected = (item: Item, index: number) => {
-    if (index === PRESET.length - 1) {
+  const handleSelected = (item: Item) => {
+    if (item.id === "0") {
       router.push("/(onboarding)/SetCustomTime");
       return;
     }
 
-    setSelectedItem(item.value);
+    setSelectedItem(item);
     return;
   };
 
   const handleContinue = async () => {
-    setLoading(true);
-    try {
-      if (!selectedItem) {
-        return;
-      }
+    if (!selectedItem) {
+      return;
+    }
 
+    setLoading(true);
+
+    try {
       // updates the scroll budget in the context
-      await updateScrollBudget(minutesToMilliseconds(selectedItem));
+      const budgetInMilliseconds = minutesToMilliseconds(selectedItem.value);
+
+      await updateScrollBudget(budgetInMilliseconds);
 
       router.replace("/(onboarding)/GetNotified");
+
+      setLoading(false);
+
       return;
     } catch (error) {
-      if (error instanceof Error) {
-        setUpdateError(error.message);
-        setShowUpdateError(true);
-        return;
-      }
-
+      console.error("An error occured while saving your daily budget", error);
       setUpdateError(
-        "An error occured while creating your account. Please try again",
+        "An error occured while saving your daily budget. Please try again",
       );
       setShowUpdateError(true);
-      return;
-    } finally {
       setLoading(false);
+      return;
     }
   };
 
@@ -111,11 +117,11 @@ const SetDailyBudget = () => {
 
       <View style={styles.form}>
         <Text style={styles.heading}>
-          How much time do you want to spend on social media daily?
+          How much time do you want to spend on the apps you selected each day?
         </Text>
         <Text style={styles.supportingText}>
-          This will be your shared daily budget across all apps. Budgets can
-          only change once a day.
+          This will be your shared daily budget across all the apps you
+          selected. You can change your budget once per day.
         </Text>
 
         <View>
@@ -124,10 +130,10 @@ const SetDailyBudget = () => {
             keyExtractor={(item, _idx) => _idx.toString()}
             renderItem={({ item, index }) => (
               <Pressable
-                onPress={() => handleSelected(item, index)}
+                onPress={() => handleSelected(item)}
                 style={[
                   styles.listItem,
-                  selectedItem === item.value ? styles.itemSelected : {},
+                  selectedItem?.id === item.id && styles.itemSelected,
                 ]}
               >
                 <Ionicons

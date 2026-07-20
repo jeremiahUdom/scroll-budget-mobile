@@ -140,17 +140,17 @@ const UpdateScrollBudget = () => {
 
     const validation = minutesSchema.safeParse({ minutes: parsed });
 
-    if (parsed === 60 && parsed <= 60) {
-      const userInput = parseInt(hours);
-      setHours(clamp(userInput + 1, 0, 24).toString());
-      setMinutes("");
-      return;
-    }
-
     if (!validation.success) {
       const error = validation.error.issues[0].message;
       setInputError(error);
       setShowInputError(true);
+      return;
+    }
+
+    if (parsed === 60 && parsed <= 60) {
+      const userInput = parseInt(hours);
+      setHours(clamp(userInput + 1, 0, 24).toString());
+      setMinutes("");
       return;
     }
 
@@ -180,22 +180,20 @@ const UpdateScrollBudget = () => {
 
       router.replace("/(tabs)/Settings");
 
+      setLoading(false);
+
       return;
     } catch (error) {
-      console.error("error fetching budget", error);
-      if (error instanceof Error) {
-        setUpdateError(error.message);
-        setShowUpdateError(true);
-        return;
-      }
-
+      console.error(
+        "An error occured while updating your daily budget. Please try again",
+        error,
+      );
       setUpdateError(
-        "An error occured while creating your account. Please try again",
+        "An error occured while updating your daily budget. Please try again",
       );
       setShowUpdateError(true);
-      return;
-    } finally {
       setLoading(false);
+      return;
     }
   };
 

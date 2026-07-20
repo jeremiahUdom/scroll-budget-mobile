@@ -56,52 +56,30 @@ const SelectApps = () => {
 
   const keyExtractor = useCallback((item: App) => item.packageName, []);
 
-  const ListHeader = useCallback(
-    () => <Text style={styles.caption}>Scroll down to see all apps</Text>,
-    [],
-  );
-
-  const ListEmptyComponent = useCallback(
-    () => (
-      <View>
-        <Text style={styles.emptyStateTitle}>No Apps Found</Text>
-        <Text style={styles.emptyStateText}>
-          It looks like you don&apos;t have any apps installed yet
-        </Text>
-      </View>
-    ),
-    [],
-  );
-
   useFocusEffect(
     useCallback(() => {
       const fetchSelectedApps = async () => {
         try {
           // get all the installed apps on the user's phone
           const installedApps = await getInstalledApps();
+
           const apps: App[] = installedApps.map((app) => ({
             name: app.name,
             packageName: app.packageName,
             icon: app.icon,
           }));
+
           setApps(apps);
+
           setSelectedApps(myTrackedApps);
+
+          setInitialising(true);
+
           return;
         } catch (error) {
           console.error("Error loading screen", error);
-          if (error instanceof Error) {
-            setError(error.message);
-            setShowError(true);
-            return;
-          }
-
-          setError(
-            "An error occured while loading your dashboard. Please try again",
-          );
-          setShowError(true);
-          return;
-        } finally {
           setInitialising(false);
+          return;
         }
       };
 
@@ -122,21 +100,21 @@ const SelectApps = () => {
       await updateTrackedApps(selectedApps);
 
       router.replace("/(tabs)/Settings");
+
+      setLoading(false);
+
       return;
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-        setShowError(true);
-        return;
-      }
-
+      console.error(
+        "An error occured while trying to save your selected apps.",
+        error,
+      );
       setError(
-        "An error occured while creating your account. Please try again",
+        "An error occured while trying to save your selected apps. Please try again",
       );
       setShowError(true);
-      return;
-    } finally {
       setLoading(false);
+      return;
     }
   };
 
@@ -166,11 +144,17 @@ const SelectApps = () => {
               data={apps}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
-              ListHeaderComponent={apps.length !== 0 ? ListHeader : null}
               initialNumToRender={12}
               maxToRenderPerBatch={12}
               windowSize={7}
-              ListEmptyComponent={ListEmptyComponent}
+              ListEmptyComponent={
+                <View>
+                  <Text style={styles.emptyStateTitle}>No Apps Found</Text>
+                  <Text style={styles.emptyStateText}>
+                    It looks like you don&apos;t have any apps installed yet
+                  </Text>
+                </View>
+              }
             />
           )}
         </View>

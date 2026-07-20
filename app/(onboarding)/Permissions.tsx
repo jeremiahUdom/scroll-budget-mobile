@@ -4,6 +4,7 @@ import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
+import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   hasUsagePermission,
@@ -45,11 +46,12 @@ const Permissions = () => {
     const subscription = AppState.addEventListener("change", async (state) => {
       if (state === "active" && wentToSettings.current) {
         wentToSettings.current = false;
-        const granted = await hasUsagePermission();
-        if (granted) {
+        const permission = await hasUsagePermission();
+        if (permission) {
           await updateHasOnboarded(true);
           router.replace("/SelectApps");
         }
+        await setUsageStatsPermission(permission);
       }
     });
 

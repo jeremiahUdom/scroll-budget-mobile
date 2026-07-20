@@ -11,6 +11,10 @@ import {
   getTrackedApps,
   setTrackedApps,
 } from "@/utils/localDataManager/trackedAppsStorage";
+import {
+  getUsageStatsPermission,
+  setUsageStatsPermission,
+} from "@/utils/localDataManager/usageStatStorage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type UserPreferenceContextType = {
@@ -21,6 +25,8 @@ type UserPreferenceContextType = {
   isInitialising: boolean;
   hasOnboarded: boolean;
   updateHasOnboarded: (value: boolean) => Promise<void>;
+  hasPermissionToViewUsageStats: boolean;
+  updateUsageStatsPermission: (value: boolean) => Promise<void>;
 };
 
 const UserPreferenceContext = createContext<
@@ -49,6 +55,8 @@ export const UserPreferenceProvider = ({ children }: Props) => {
   const [scrollBudgetInMs, setScrollBudgetInMs] = useState(0);
   const [isInitialising, setIsInitialising] = useState(true);
   const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [hasPermissionToViewUsageStats, setHasPermissionToViewUsageStats] =
+    useState(false);
 
   const updateTrackedApps = async (apps: App[]) => {
     try {
@@ -84,6 +92,11 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     }
   };
 
+  const updateUsageStatsPermission = async (value: boolean) => {
+    setHasPermissionToViewUsageStats(value);
+    await setUsageStatsPermission(value);
+  };
+
   useEffect(() => {
     const initialiseApp = async () => {
       try {
@@ -95,6 +108,9 @@ export const UserPreferenceProvider = ({ children }: Props) => {
           return;
         }
         setHasOnboarded(true);
+
+        const usageStatPermission = await getUsageStatsPermission();
+        setHasPermissionToViewUsageStats(usageStatPermission);
 
         // get users budget from async storage
         const budget = await getScrollBudget();
@@ -125,6 +141,8 @@ export const UserPreferenceProvider = ({ children }: Props) => {
         isInitialising,
         hasOnboarded,
         updateHasOnboarded,
+        hasPermissionToViewUsageStats,
+        updateUsageStatsPermission,
       }}
     >
       {children}

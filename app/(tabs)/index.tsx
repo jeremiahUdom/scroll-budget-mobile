@@ -9,6 +9,7 @@ import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
 import { TrackedAppUsageStat } from "@/types/App";
 import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
+import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   getHourlyUsage,
@@ -36,10 +37,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Dashboard = () => {
   const today = new Date();
-  const { scrollBudgetInMs, myTrackedApps } = useUserPreference();
+  const { scrollBudgetInMs, myTrackedApps, hasPermissionToViewUsageStats } =
+    useUserPreference();
   const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([]);
-  const [hasPermissionToViewUsageStats, setHasPermissionToViewUsageStats] =
-    useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(true);
   const [loadingUsage, setLoadingUsage] = useState(false);
   const [error, setError] = useState("");
@@ -50,17 +50,18 @@ const Dashboard = () => {
 
   const checkPermission = useCallback(async () => {
     const permission = await hasUsagePermission();
-    setHasPermissionToViewUsageStats(permission);
+    setUsageStatsPermission(permission);
   }, []);
 
   const loadDashboard = useCallback(async () => {
+    if (myTrackedApps.length === 0) {
+      setUsageStats([]);
+      return;
+    }
+
+    setLoadingUsage(true);
+
     try {
-      setLoadingUsage(true);
-
-      if (myTrackedApps.length === 0) {
-        return;
-      }
-
       // make only one API Call to fetch everything. i will fix this by writing the native code to fetch usage stats by myself using expo native modules
       const usageStats = (
         await Promise.all(
@@ -78,23 +79,16 @@ const Dashboard = () => {
       ).sort((a, b) => b.totalTimeInForeground - a.totalTimeInForeground);
 
       setUsageStats(usageStats);
+      setLoadingUsage(false);
     } catch (error) {
       console.error("Dashboard load error:", error);
-      if (error instanceof Error) {
-        setError(error.message);
-        setShowError(true);
-        return;
-      }
-
       setError(
         "An error occured while loading your dashboard. Please try again",
       );
       setShowError(true);
-      return;
-    } finally {
       setLoadingUsage(false);
     }
-  }, [myTrackedApps]);
+  }, [myTrackedApps, setUsageStats, setLoadingUsage, setError, setShowError]);
 
   // check app state
   useEffect(() => {
