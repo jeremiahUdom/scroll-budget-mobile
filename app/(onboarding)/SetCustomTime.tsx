@@ -1,6 +1,6 @@
 import AppButton from "@/components/AppButton";
-import ErrorModal from "@/components/ErrorModal";
 import GoBackBtn from "@/components/GoBackBtn";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -213,7 +213,7 @@ const SetCustomTime = () => {
         <View style={styles.inputs}>
           <View style={styles.item}>
             <Pressable style={styles.control} onPress={increaseHourCounter}>
-              <Ionicons name="chevron-up" size={20} color={colors.darkMuted} />
+              <Ionicons name="chevron-up" size={20} color={colors.iconMuted} />
             </Pressable>
 
             <TextInput
@@ -227,7 +227,7 @@ const SetCustomTime = () => {
               <Ionicons
                 name="chevron-down"
                 size={20}
-                color={colors.darkMuted}
+                color={colors.iconMuted}
               />
             </Pressable>
 
@@ -241,7 +241,7 @@ const SetCustomTime = () => {
 
           <View style={styles.item}>
             <Pressable style={styles.control} onPress={increaseMinuteCounter}>
-              <Ionicons name="chevron-up" size={20} color={colors.darkMuted} />
+              <Ionicons name="chevron-up" size={20} color={colors.iconMuted} />
             </Pressable>
 
             <TextInput
@@ -255,7 +255,7 @@ const SetCustomTime = () => {
               <Ionicons
                 name="chevron-down"
                 size={20}
-                color={colors.darkMuted}
+                color={colors.iconMuted}
               />
             </Pressable>
 
@@ -306,14 +306,14 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.md,
   },
 
   supportingText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     fontFamily: fonts.semiBold,
     textAlign: "center",
-    color: colors.dark,
+    color: colors.text,
     backgroundColor: colors.surfaceMuted,
     borderRadius: 10,
   },
@@ -366,6 +366,6 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: fonts.medium,
     fontSize: typography.label,
-    color: colors.dark,
+    color: colors.textMuted,
   },
 });

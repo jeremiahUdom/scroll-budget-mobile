@@ -1,6 +1,6 @@
 import AppButton from "@/components/AppButton";
 import AppItem from "@/components/AppItem";
-import ErrorModal from "@/components/ErrorModal";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -8,8 +8,8 @@ import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
 import { App } from "@/types/App";
 import { getInstalledApps } from "@sahil_sensei/react-native-app-usage";
-import { Link, useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import { Link, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -22,18 +22,44 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SelectApps = () => {
   const router = useRouter();
   const { updateTrackedApps } = useUserPreference();
-  const [isFetchingUserInstalledApps, setisFetchingUserInstalledApps] =
-    useState(false);
-  const [error, setError] = useState("");
-  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedApps, setSelectedApps] = useState<App[]>([]);
   const [apps, setApps] = useState<App[]>([]);
+  const [isFetchingUserInstalledApps, setisFetchingUserInstalledApps] =
+    useState(false);
+  const [error, setError] = useState({
+    
+  })
 
   const selectedSet = useMemo(
     () => new Set(selectedApps.map((app) => app.packageName)),
     [selectedApps],
   );
+
+  const fetchUserInstalledApps = useCallback(async () => {
+    setisFetchingUserInstalledApps(true);
+    try {
+      // get all the installed apps on the user's phone
+      const installedApps = await getInstalledApps();
+      const apps: App[] = installedApps.map((app) => ({
+        name: app.name,
+        packageName: app.packageName,
+        icon: app.icon,
+      }));
+      setApps(apps);
+      setisFetchingUserInstalledApps(false);
+      return;
+    } catch (error) {
+      console.log("Couldn't load your apps", error);
+      setError({
+        visible: true,
+        title: "Couldn't load your apps",
+        message:
+          "We couldn't load the apps installed on your device. Please try again.",
+      });
+      setisFetchingUserInstalledApps(false);
+    }
+  }, []);
 
   const handleSelected = useCallback((app: App) => {
     setSelectedApps((prev) =>
@@ -59,36 +85,16 @@ const SelectApps = () => {
 
   const keyExtractor = useCallback((item: App) => item.packageName, []);
 
-  // runs immediately the screen is focused
-  useFocusEffect(
-    useCallback(() => {
-      const fetchSelectedApps = async () => {
-        setisFetchingUserInstalledApps(true);
-        try {
-          // get all the installed apps on the user's phone
-          const installedApps = await getInstalledApps();
-          const apps: App[] = installedApps.map((app) => ({
-            name: app.name,
-            packageName: app.packageName,
-            icon: app.icon,
-          }));
-          setApps(apps);
-          setisFetchingUserInstalledApps(false);
-          return;
-        } catch (error) {
-          console.error("Dashboard load error:", error);
-          setisFetchingUserInstalledApps(false);
-        }
-      };
-
-      fetchSelectedApps();
-    }, []),
-  );
+  useEffect(() => {
+    fetchUserInstalledApps();
+  }, [fetchUserInstalledApps]);
 
   const handleContinue = async () => {
     if (selectedApps.length === 0) {
-      setError("You have not chosen any app.");
-      setShowError(true);
+      // No apps selected
+      // setErrorTitle("No apps selected");
+      // setValidationError("Choose at least one app to continue.");
+      // setShowValidatiError(true);
       return;
     }
 
@@ -107,11 +113,13 @@ const SelectApps = () => {
         "An error occured while trying to save your selected apps.",
         error,
       );
-      setError(
-        "An error occured while trying to save your selected apps. Please try again",
-      );
-      setShowError(true);
-      setLoading(false);
+      // Save failed
+      // setErrorTitle("Couldn't save your selection");
+      // setError(
+      //   "An error occurred while saving your selected apps. Please try again.",
+      // );
+      // setShowError(true);
+      // setLoading(false);
       return;
     }
   };
@@ -150,13 +158,14 @@ const SelectApps = () => {
               maxToRenderPerBatch={12}
               windowSize={7}
               ListEmptyComponent={
-                <View>
+                <View style={styles.emptyState}>
                   <Text style={styles.emptyStateTitle}>No Apps Found</Text>
                   <Text style={styles.emptyStateText}>
                     It looks like you don&apos;t have any apps installed yet
                   </Text>
                 </View>
               }
+              style={styles.list}
             />
           ) : (
             <ActivityIndicator size={"large"} color={colors.primary} />
@@ -170,8 +179,10 @@ const SelectApps = () => {
 
       <ErrorModal
         modalVisible={showError}
+        title={errorTitle}
         onCloseModal={() => setShowError(false)}
         error={error}
+        onRetry={fetchUserInstalledApps}
       />
     </SafeAreaView>
   );
@@ -182,7 +193,7 @@ export default SelectApps;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -200,7 +211,7 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     borderRadius: 30,
   },
 
@@ -211,7 +222,7 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.body,
     fontFamily: fonts.medium,
     textAlign: "center",
@@ -220,14 +231,14 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
 
   supportingText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
@@ -237,22 +248,32 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
 
+  list: {
+    backgroundColor: colors.surface,
+    borderRadius: 15,
+    paddingHorizontal: spacing.sm,
+  },
+
+  emptyState: {
+    paddingTop: spacing.md,
+  },
+
   emptyStateTitle: {
     fontFamily: fonts.semiBold,
     fontSize: typography.medium,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
 
   emptyStateText: {
     fontFamily: fonts.regular,
     fontSize: typography.body,
-    color: colors.darkMuted,
+    color: colors.textMuted,
   },
 
   caption: {
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontFamily: fonts.regular,
     marginBottom: spacing.md,
   },

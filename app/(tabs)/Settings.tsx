@@ -74,14 +74,14 @@ export default Profile;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
   title: {
     fontSize: typography.heading,
     fontFamily: fonts.semiBold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.xxl,
   },
 
@@ -91,18 +91,10 @@ const styles = StyleSheet.create({
 
   items: {
     paddingHorizontal: spacing.md,
-    backgroundColor: colors.light,
+    backgroundColor: colors.surface,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.surfaceMuted,
-  },
-
-  sectionLabel: {
-    textTransform: "uppercase",
-    color: colors.darkMuted,
-    fontFamily: fonts.medium,
-    fontSize: typography.small,
-    marginBottom: spacing.md,
   },
 
   hr: {
@@ -114,7 +106,7 @@ const styles = StyleSheet.create({
   version: {
     fontFamily: fonts.regular,
     fontSize: typography.small,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     textAlign: "center",
   },
 });

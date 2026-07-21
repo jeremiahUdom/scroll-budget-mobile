@@ -87,9 +87,9 @@ const Permissions = () => {
           <Ionicons
             name="phone-portrait-outline"
             size={20}
-            color={colors.darkMuted}
+            color={colors.iconMuted}
           />
-          <Text style={styles.infoCardSubtitle}>
+          <Text style={styles.infoCardText}>
             Everything stays on your device. No accounts, no internet
             connection, no data ever leaves your phone.
           </Text>
@@ -117,7 +117,7 @@ export default Permissions;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -148,14 +148,14 @@ const styles = StyleSheet.create({
     fontSize: typography.heading,
     fontFamily: fonts.bold,
     textAlign: "center",
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.md,
   },
 
   body: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 26,
     marginBottom: spacing.md,
   },
@@ -163,14 +163,14 @@ const styles = StyleSheet.create({
   infoCard: {
     width: "100%",
     padding: spacing.md,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     borderRadius: 10,
     gap: spacing.xs,
   },
 
-  infoCardSubtitle: {
+  infoCardText: {
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
     lineHeight: 22,
   },
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   caption: {
     fontSize: typography.caption,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     textAlign: "center",
     lineHeight: 22,
   },
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.darkMuted,
-    fontSize: typography.body,
-    fontFamily: fonts.medium,
+    color: colors.text,
+    fontSize: typography.medium,
+    fontFamily: fonts.semiBold,
     textAlign: "center",
   },
 });

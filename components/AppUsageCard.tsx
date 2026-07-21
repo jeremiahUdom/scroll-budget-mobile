@@ -1,17 +1,17 @@
-import { colors } from "@/constants/colors"
-import { fonts } from "@/constants/fonts"
-import { spacing } from "@/constants/spacing"
-import { typography } from "@/constants/typography"
-import { TrackedAppUsageStat } from "@/types/App"
-import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime"
-import React from "react"
-import { Image, StyleSheet, Text, View, ViewStyle } from "react-native"
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { TrackedAppUsageStat } from "@/types/App";
+import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
+import React from "react";
+import { Image, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 interface Props {
-  scrollBudgetInMs: number
-  app: TrackedAppUsageStat
-  customStyle?: ViewStyle
-  isLoadingUsage?: boolean
+  scrollBudgetInMs: number;
+  app: TrackedAppUsageStat;
+  customStyle?: ViewStyle;
+  isLoadingUsage?: boolean;
 }
 
 const AppUsageCard = ({
@@ -20,17 +20,17 @@ const AppUsageCard = ({
   customStyle,
   isLoadingUsage = false,
 }: Props) => {
-  const hasBudget = scrollBudgetInMs > 0
+  const hasBudget = scrollBudgetInMs > 0;
   const totalTimeInForeground = formatDurationFromMilliseconds(
     app.totalTimeInForeground,
-  )
+  );
   const budgetUsagePercentage = hasBudget
     ? Math.min(
         Math.round((app.totalTimeInForeground / scrollBudgetInMs) * 100),
         100,
       )
-    : 0
-  const progressWidth = Math.min(budgetUsagePercentage, 100)
+    : 0;
+  const progressWidth = Math.min(budgetUsagePercentage, 100);
 
   return (
     <View style={[styles.appUsageCard, customStyle]}>
@@ -64,10 +64,10 @@ const AppUsageCard = ({
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default AppUsageCard
+export default AppUsageCard;
 
 const styles = StyleSheet.create({
   appUsageCard: {
@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
   appTitle: {
     fontFamily: fonts.medium,
     fontSize: typography.body,
-    color: colors.dark,
+    color: colors.text,
   },
 
   statValue: {
     fontFamily: fonts.regular,
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
   },
 
   progressBarContainer: {
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: colors.primary,
   },
-})
+});

@@ -1,15 +1,15 @@
-import { colors } from "@/constants/colors"
-import { fonts } from "@/constants/fonts"
-import { spacing } from "@/constants/spacing"
-import { typography } from "@/constants/typography"
-import Ionicons from "@react-native-vector-icons/ionicons"
-import { openUsagePermissionSettings } from "@sahil_sensei/react-native-app-usage"
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native"
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { openUsagePermissionSettings } from "@sahil_sensei/react-native-app-usage";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface PermissionModalProps {
-  visible: boolean
-  onOpenSettings: () => void
-  onDismiss: () => void
+  visible: boolean;
+  onOpenSettings: () => void;
+  onDismiss: () => void;
 }
 
 const PermissionModal = ({
@@ -18,9 +18,9 @@ const PermissionModal = ({
   onDismiss,
 }: PermissionModalProps) => {
   const handleOpenSettings = async () => {
-    onOpenSettings()
-    await openUsagePermissionSettings()
-  }
+    onOpenSettings();
+    await openUsagePermissionSettings();
+  };
 
   return (
     <Modal
@@ -41,7 +41,7 @@ const PermissionModal = ({
             <Ionicons
               name="lock-closed-outline"
               size={50}
-              color={colors.darkMuted}
+              color={colors.iconSecondary}
             />
           </View>
 
@@ -60,7 +60,6 @@ const PermissionModal = ({
             <Pressable
               style={({ pressed }) => [
                 styles.button,
-                styles.primaryButton,
                 pressed && styles.buttonPressed,
               ]}
               onPress={handleOpenSettings}
@@ -70,11 +69,7 @@ const PermissionModal = ({
 
             {/* Maybe Later button */}
             <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                pressed && styles.buttonPressed,
-              ]}
+              style={({ pressed }) => [pressed && styles.buttonPressed]}
               onPress={onDismiss}
             >
               <Text style={styles.secondaryButtonText}>Maybe Later</Text>
@@ -83,10 +78,10 @@ const PermissionModal = ({
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default PermissionModal
+export default PermissionModal;
 
 const styles = StyleSheet.create({
   overlay: {
@@ -103,7 +98,7 @@ const styles = StyleSheet.create({
   },
 
   modal: {
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.elevated,
     borderRadius: 16,
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.lg,
@@ -119,7 +114,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: fonts.bold,
     fontSize: typography.heading,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.sm,
     textAlign: "center",
   },
@@ -127,7 +122,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: fonts.regular,
     fontSize: typography.body,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     textAlign: "center",
     marginBottom: spacing.xl,
     lineHeight: 24,
@@ -135,7 +130,7 @@ const styles = StyleSheet.create({
 
   buttonsContainer: {
     width: "100%",
-    gap: spacing.sm,
+    gap: spacing.md,
   },
 
   button: {
@@ -144,14 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-  },
-
-  primaryButton: {
     backgroundColor: colors.primary,
-  },
-
-  secondaryButton: {
-    backgroundColor: colors.surfaceMuted,
   },
 
   buttonPressed: {
@@ -167,6 +155,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: fonts.medium,
     fontSize: typography.body,
-    color: colors.darkMuted,
+    color: colors.text,
+    textAlign: "center",
   },
-})
+});

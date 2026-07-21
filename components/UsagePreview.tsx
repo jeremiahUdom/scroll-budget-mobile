@@ -1,58 +1,56 @@
-import { View, Text, StyleSheet } from 'react-native'
-import Svg, { Circle, G } from 'react-native-svg'
-import React from 'react'
-import { colors } from '@/constants/colors'
-import { fonts } from '@/constants/fonts'
-import { typography } from '@/constants/typography'
-import { formatDurationFromMilliseconds} from '@/utils/formatMinutesToTime'
-import { spacing } from '@/constants/spacing'
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
+import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Svg, { Circle, G } from "react-native-svg";
 
 interface Props {
-  scrollBudgetInMs: number
-  budgetUsedInMs: number
-  isDashboardLoading?: boolean
+  scrollBudgetInMs: number;
+  budgetUsedInMs: number;
+  isDashboardLoading?: boolean;
 }
 
 const UsagePreview = ({
   scrollBudgetInMs = 0,
   budgetUsedInMs = 0,
-  isDashboardLoading = false
+  isDashboardLoading = false,
 }: Props) => {
-  const hasBudget = scrollBudgetInMs > 0
+  const hasBudget = scrollBudgetInMs > 0;
   const percentageUsed = hasBudget
     ? Math.min((budgetUsedInMs / scrollBudgetInMs) * 100, 100)
-    : 0
+    : 0;
 
-  const radius = 100
-  const strokeWidth = 15
-  const circumference = 2 * Math.PI * radius
+  const radius = 100;
+  const strokeWidth = 15;
+  const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = hasBudget
     ? circumference - (percentageUsed / 100) * circumference
-    : circumference
+    : circumference;
 
   const getBudgetLeft = (scrollBudgetInMs: number, budgetUsedInMs: number) => {
-    const budgetLeft = Math.max(scrollBudgetInMs - budgetUsedInMs, 0)
-    
-    return formatDurationFromMilliseconds(budgetLeft)
-  }
+    const budgetLeft = Math.max(scrollBudgetInMs - budgetUsedInMs, 0);
+
+    return formatDurationFromMilliseconds(budgetLeft);
+  };
 
   const getRemark = (percentageUsed: number) => {
     if (percentageUsed === 0) {
-      return "Ready to start"
+      return "Ready to start";
     }
 
     if (percentageUsed >= 100) {
-      return percentageUsed === 100
-        ? "Budget reached"
-        : "Over budget"
+      return percentageUsed === 100 ? "Budget reached" : "Over budget";
     }
 
     if (percentageUsed >= 80) {
-      return "Almost there"
+      return "Almost there";
     }
 
-    return "On track"
-  }
+    return "On track";
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +59,9 @@ const UsagePreview = ({
         height={radius * 2 + strokeWidth}
         style={styles.svg}
       >
-        <G transform={`rotate(-90 ${radius + strokeWidth / 2} ${radius + strokeWidth / 2})`}>
+        <G
+          transform={`rotate(-90 ${radius + strokeWidth / 2} ${radius + strokeWidth / 2})`}
+        >
           <Circle
             cx={radius + strokeWidth / 2}
             cy={radius + strokeWidth / 2}
@@ -70,7 +70,7 @@ const UsagePreview = ({
             strokeWidth={strokeWidth}
             fill="none"
           />
-        
+
           <Circle
             cx={radius + strokeWidth / 2}
             cy={radius + strokeWidth / 2}
@@ -88,36 +88,41 @@ const UsagePreview = ({
 
       {/* Center content */}
       <View style={styles.centerContent}>
-        <Text style={styles.timeUsed}>{isDashboardLoading ? '-' : formatDurationFromMilliseconds(budgetUsedInMs)}</Text>
+        <Text style={styles.timeUsed}>
+          {isDashboardLoading
+            ? "-"
+            : formatDurationFromMilliseconds(budgetUsedInMs)}
+        </Text>
         <Text style={styles.label}>used today</Text>
         {hasBudget ? (
           <>
             {percentageUsed < 100 && (
               <Text style={styles.timeLeft}>
-                {isDashboardLoading ? '-' : getBudgetLeft(scrollBudgetInMs, budgetUsedInMs)} left
+                {isDashboardLoading
+                  ? "-"
+                  : getBudgetLeft(scrollBudgetInMs, budgetUsedInMs)}{" "}
+                left
               </Text>
             )}
 
             <Text style={styles.status}>
-              {isDashboardLoading ? '-' : getRemark(percentageUsed)}
+              {isDashboardLoading ? "-" : getRemark(percentageUsed)}
             </Text>
           </>
         ) : (
-          <Text style={styles.status}>
-            Set a daily budget
-          </Text>
+          <Text style={styles.status}>Set a daily budget</Text>
         )}
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default UsagePreview
+export default UsagePreview;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   svg: {
@@ -125,27 +130,27 @@ const styles = StyleSheet.create({
   },
 
   centerContent: {
-    position: 'absolute',
-    alignItems: 'center',
+    position: "absolute",
+    alignItems: "center",
   },
 
   timeUsed: {
     fontFamily: fonts.semiBold,
     fontSize: 32,
-    color: colors.dark,
+    color: colors.text,
   },
 
   label: {
     fontFamily: fonts.regular,
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     marginTop: 4,
   },
 
   timeLeft: {
     fontFamily: fonts.regular,
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     marginTop: 2,
   },
 
@@ -155,6 +160,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: spacing.sm,
     width: 150,
-    textAlign: 'center',
+    textAlign: "center",
   },
-})
+});

@@ -1,7 +1,7 @@
 import AppUsageCard from "@/components/AppUsageCard";
-import ErrorModal from "@/components/ErrorModal";
 import PermissionModal from "@/components/PermissionModal";
 import UsagePreview from "@/components/UsagePreview";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -12,26 +12,26 @@ import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
 import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
-  getHourlyUsage,
-  hasUsagePermission,
-  openUsagePermissionSettings,
+    getHourlyUsage,
+    hasUsagePermission,
+    openUsagePermissionSettings,
 } from "@sahil_sensei/react-native-app-usage";
 import { Link } from "expo-router";
 import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from "react";
 import {
-  ActivityIndicator,
-  AppState,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    AppState,
+    FlatList,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -82,9 +82,7 @@ const Dashboard = () => {
       setLoadingUsage(false);
     } catch (error) {
       console.error("Dashboard load error:", error);
-      setError(
-        "An error occured while loading your dashboard. Please try again",
-      );
+      setError("Something went wrong. Try again.");
       setShowError(true);
       setLoadingUsage(false);
     }
@@ -139,8 +137,8 @@ const Dashboard = () => {
       <View style={styles.emptyTextContainer}>
         <Text style={styles.emptyTitle}>No app data available</Text>
         <Text style={styles.emptySubtitle}>
-          You haven&apost selected any apps yet. To see your usage stats, please
-          add apps to your tracked list.
+          You haven&apos;t selected any apps yet. To see your usage stats,
+          please add apps to your tracked list.
         </Text>
       </View>
     </View>
@@ -169,7 +167,7 @@ const Dashboard = () => {
       )}
 
       <View>
-        <Text style={styles.title}>Scroll Budget</Text>
+        {/* <Text style={styles.title}>Scroll Budget</Text> */}
         <Text style={styles.weekday}>
           {today.toLocaleDateString("en-US", { weekday: "long" })}
         </Text>
@@ -204,19 +202,16 @@ const Dashboard = () => {
         />
       </View>
 
-      <View style={styles.listView}>
-        <FlatList
-          data={usageStats}
-          keyExtractor={(item) => item.packageName}
-          renderItem={({ item }) => (
-            <AppUsageCard scrollBudgetInMs={scrollBudgetInMs} app={item} />
-          )}
-          ItemSeparatorComponent={() => (
-            <View style={styles.listItemSeparator} />
-          )}
-          ListEmptyComponent={ListEmptyComponent}
-        />
-      </View>
+      <FlatList
+        data={usageStats}
+        keyExtractor={(item) => item.packageName}
+        renderItem={({ item }) => (
+          <AppUsageCard scrollBudgetInMs={scrollBudgetInMs} app={item} />
+        )}
+        ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
+        ListEmptyComponent={ListEmptyComponent}
+        style={styles.list}
+      />
 
       <PermissionModal
         visible={showPermissionModal}
@@ -226,7 +221,9 @@ const Dashboard = () => {
       <ErrorModal
         modalVisible={showError}
         onCloseModal={() => setShowError(false)}
+        onRetry={loadDashboard}
         error={error}
+        title="Couldn't load your usage data"
       />
     </SafeAreaView>
   );
@@ -237,7 +234,7 @@ export default Dashboard;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     gap: spacing.xl,
@@ -262,7 +259,7 @@ const styles = StyleSheet.create({
   bannerTitle: {
     fontFamily: fonts.semiBold,
     fontSize: typography.small,
-    color: colors.dark,
+    color: colors.textInverse,
     marginTop: 2,
     textTransform: "uppercase",
   },
@@ -270,7 +267,7 @@ const styles = StyleSheet.create({
   bannerSubtitle: {
     fontFamily: fonts.regular,
     fontSize: typography.xs,
-    color: colors.darkMuted,
+    color: colors.textInverse,
   },
 
   enableButton: {
@@ -289,14 +286,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.text,
     textTransform: "uppercase",
   },
 
   weekday: {
     fontSize: typography.heading,
     fontFamily: fonts.semiBold,
-    color: colors.dark,
+    color: colors.text,
   },
 
   dateRow: {
@@ -308,13 +305,13 @@ const styles = StyleSheet.create({
   dateRowText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
   },
 
   dotSeparator: {
     width: 5,
     height: 5,
-    backgroundColor: colors.darkMuted,
+    backgroundColor: colors.textMuted,
     borderRadius: 2.5,
   },
 
@@ -325,8 +322,12 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
 
-  listView: {
+  list: {
     flex: 1,
+    backgroundColor: colors.surface,
+    marginBottom: spacing.lg,
+    borderRadius: 15,
+    paddingHorizontal: spacing.sm,
   },
 
   emptyContainer: {
@@ -337,19 +338,21 @@ const styles = StyleSheet.create({
   emptyTextContainer: {
     alignItems: "center",
     maxWidth: 300,
+    marginTop: spacing.lg,
+    gap: spacing.md,
   },
 
   emptyTitle: {
     fontFamily: fonts.semiBold,
     fontSize: typography.body,
-    color: colors.dark,
+    color: colors.text,
     textAlign: "center",
   },
 
   emptySubtitle: {
     fontFamily: fonts.regular,
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     textAlign: "center",
   },
 

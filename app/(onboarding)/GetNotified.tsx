@@ -1,5 +1,5 @@
 import AppButton from "@/components/AppButton";
-import ErrorModal from "@/components/ErrorModal";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -52,7 +52,7 @@ const GetNotified = () => {
               <Ionicons
                 name="warning-outline"
                 size={25}
-                color={colors.darkMuted}
+                color={colors.iconMuted}
               />
               <Text style={styles.text}>A heads up at 80% of your budget</Text>
             </View>
@@ -61,7 +61,7 @@ const GetNotified = () => {
 
         <View style={styles.infoCard}>
           <View style={styles.infoCardTitleContainer}>
-            <Ionicons name="bulb-outline" size={20} color={colors.darkMuted} />
+            <Ionicons name="bulb-outline" size={20} color={colors.iconMuted} />
             <Text style={styles.infoCardTitle}>Tip</Text>
           </View>
           <Text style={styles.infoCardSubtitle}>
@@ -99,7 +99,7 @@ export default GetNotified;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     borderRadius: 30,
   },
 
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.body,
     fontFamily: fonts.medium,
     textAlign: "center",
@@ -141,14 +141,14 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
 
   supportingText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontFamily: fonts.regular,
     maxWidth: 250,
   },
@@ -173,15 +173,15 @@ const styles = StyleSheet.create({
   notNow: {
     alignSelf: "center",
     fontFamily: fonts.semiBold,
-    color: colors.darkMuted,
-    fontSize: typography.body,
+    color: colors.text,
+    fontSize: typography.medium,
     marginTop: spacing.lg,
   },
 
   infoCard: {
     width: "100%",
     paddingVertical: spacing.md,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     borderRadius: 10,
     paddingHorizontal: spacing.sm,
     marginTop: spacing.lg,
@@ -195,13 +195,13 @@ const styles = StyleSheet.create({
 
   infoCardTitle: {
     fontFamily: fonts.medium,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
   },
 
   infoCardSubtitle: {
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
     lineHeight: 22,
   },

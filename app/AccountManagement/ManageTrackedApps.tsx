@@ -1,7 +1,7 @@
 import AppButton from "@/components/AppButton";
 import AppItem from "@/components/AppItem";
-import ErrorModal from "@/components/ErrorModal";
 import GoBackBtn from "@/components/GoBackBtn";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -12,11 +12,11 @@ import { getInstalledApps } from "@sahil_sensei/react-native-app-usage";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -44,13 +44,16 @@ const SelectApps = () => {
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: App }) => (
-      <AppItem
-        item={item}
-        onSelected={handleSelected}
-        appSelected={selectedSet.has(item.packageName)}
-      />
-    ),
+    ({ item }: { item: App }) => {
+      const isSelected = selectedSet.has(item.packageName);
+      return (
+        <AppItem
+          item={item}
+          onSelected={handleSelected}
+          appSelected={isSelected}
+        />
+      );
+    },
     [handleSelected, selectedSet],
   );
 
@@ -73,7 +76,7 @@ const SelectApps = () => {
 
           setSelectedApps(myTrackedApps);
 
-          setInitialising(true);
+          setInitialising(false);
 
           return;
         } catch (error) {
@@ -148,13 +151,14 @@ const SelectApps = () => {
               maxToRenderPerBatch={12}
               windowSize={7}
               ListEmptyComponent={
-                <View>
+                <View style={styles.emptyState}>
                   <Text style={styles.emptyStateTitle}>No Apps Found</Text>
                   <Text style={styles.emptyStateText}>
                     It looks like you don&apos;t have any apps installed yet
                   </Text>
                 </View>
               }
+              style={styles.list}
             />
           )}
         </View>
@@ -178,7 +182,7 @@ export default SelectApps;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -189,14 +193,14 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
 
   supportingText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
@@ -206,22 +210,32 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
 
+  list: {
+    backgroundColor: colors.surface,
+    borderRadius: 15,
+    paddingHorizontal: spacing.sm,
+  },
+
+  emptyState: {
+    paddingTop: spacing.md,
+  },
+
   emptyStateTitle: {
     fontFamily: fonts.semiBold,
     fontSize: typography.medium,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
 
   emptyStateText: {
     fontFamily: fonts.regular,
     fontSize: typography.body,
-    color: colors.darkMuted,
+    color: colors.textMuted,
   },
 
   caption: {
     fontSize: typography.caption,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontFamily: fonts.regular,
     marginBottom: spacing.md,
   },

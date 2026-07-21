@@ -1,5 +1,5 @@
 import AppButton from "@/components/AppButton";
-import ErrorModal from "@/components/ErrorModal";
+import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
@@ -115,7 +115,7 @@ const SetDailyBudget = () => {
         </Link>
       </View>
 
-      <View style={styles.form}>
+      <View style={styles.mainContent}>
         <Text style={styles.heading}>
           How much time do you want to spend on the apps you selected each day?
         </Text>
@@ -124,29 +124,28 @@ const SetDailyBudget = () => {
           selected. You can change your budget once per day.
         </Text>
 
-        <View>
-          <FlatList
-            data={PRESET}
-            keyExtractor={(item, _idx) => _idx.toString()}
-            renderItem={({ item, index }) => (
-              <Pressable
-                onPress={() => handleSelected(item)}
-                style={[
-                  styles.listItem,
-                  selectedItem?.id === item.id && styles.itemSelected,
-                ]}
-              >
-                <Ionicons
-                  name={index === PRESET.length - 1 ? "add" : "time-outline"}
-                  size={20}
-                  color={colors.primary}
-                />
-                <Text style={styles.text}>{item.label}</Text>
-              </Pressable>
-            )}
-            contentContainerStyle={styles.list}
-          />
-        </View>
+        <FlatList
+          data={PRESET}
+          keyExtractor={(item, _idx) => _idx.toString()}
+          renderItem={({ item, index }) => (
+            <Pressable
+              onPress={() => handleSelected(item)}
+              style={[
+                styles.listItem,
+                selectedItem?.id === item.id && styles.itemSelected,
+              ]}
+            >
+              <Ionicons
+                name={index === PRESET.length - 1 ? "add" : "time-outline"}
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.text}>{item.label}</Text>
+            </Pressable>
+          )}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+        />
       </View>
 
       <AppButton isLoading={loading} onButtonPressed={handleContinue}>
@@ -167,7 +166,7 @@ export default SetDailyBudget;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -185,7 +184,7 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     borderRadius: 30,
   },
 
@@ -196,40 +195,45 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.body,
     fontFamily: fonts.medium,
     textAlign: "center",
   },
 
+  mainContent: {
+    flex: 1,
+  },
+
   heading: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
 
   supportingText: {
     fontSize: typography.body,
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
 
-  form: {
+  list: {
     flex: 1,
   },
 
-  list: {
+  listContent: {
     gap: spacing.md,
+    paddingBottom: spacing.lg,
   },
 
   listItem: {
     height: 55,
     width: "100%",
     borderWidth: 1.5,
-    borderColor: colors.surfaceMuted,
+    borderColor: colors.elevated,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
@@ -240,10 +244,10 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: fonts.medium,
     fontSize: typography.body,
-    color: colors.dark,
+    color: colors.text,
   },
 
   itemSelected: {
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
   },
 });

@@ -29,8 +29,8 @@ const AppItem = ({ item, onSelected, appSelected = false }: Props) => {
         <Text style={styles.appName}>{item.name}</Text>
       </View>
       <Switch
-        trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
-        thumbColor={appSelected ? colors.primaryMuted : colors.darkMuted}
+        trackColor={{ false: colors.elevated, true: colors.primary }}
+        thumbColor={appSelected ? colors.primaryMuted : colors.textMuted}
         onValueChange={toggleSwitch}
         value={appSelected}
       />
@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
   appIconWrapper: {
     width: 40,
     height: 40,
-    backgroundColor: colors.surfaceLight,
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
   appName: {
     fontFamily: fonts.medium,
     fontSize: typography.body,
-    color: colors.dark,
+    color: colors.text,
     width: 180,
   },
 });

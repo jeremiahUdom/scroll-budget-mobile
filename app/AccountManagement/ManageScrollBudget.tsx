@@ -54,7 +54,7 @@ const ManageScrollBudget = () => {
             <Ionicons
               name="information-circle-outline"
               size={20}
-              color={colors.darkMuted}
+              color={colors.iconMuted}
             />
             <Text style={styles.infoCardTitle}>
               Budgets can only change once a day
@@ -80,7 +80,7 @@ const ManageScrollBudget = () => {
           <Ionicons
             name="lock-closed-outline"
             size={20}
-            color={colors.darkMuted}
+            color={colors.iconMuted}
           />
           <Text style={styles.lockedMessage}>
             Already updated today. Resets at midnight
@@ -96,7 +96,7 @@ export default ManageScrollBudget;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     padding: spacing.lg,
   },
 
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
 
   label: {
     textTransform: "uppercase",
-    color: colors.darkMuted,
+    color: colors.textSecondary,
     fontFamily: fonts.medium,
     fontSize: typography.small,
     marginBottom: spacing.xs,
@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
   scrollBudget: {
     fontSize: typography.heading,
     fontFamily: fonts.bold,
-    color: colors.dark,
+    color: colors.text,
   },
 
   infoCard: {
     width: "100%",
     paddingVertical: spacing.md,
-    backgroundColor: colors.light,
+    backgroundColor: colors.surface,
     borderRadius: 10,
     paddingHorizontal: spacing.sm,
   },
@@ -142,13 +142,13 @@ const styles = StyleSheet.create({
 
   infoCardTitle: {
     fontFamily: fonts.medium,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
   },
 
   infoCardSubtitle: {
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
   },
 
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
 
   lockedMessage: {
     fontFamily: fonts.regular,
-    color: colors.darkMuted,
+    color: colors.textMuted,
     fontSize: typography.label,
     textAlign: "center",
   },

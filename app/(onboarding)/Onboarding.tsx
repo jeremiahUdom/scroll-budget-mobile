@@ -23,27 +23,27 @@ export interface OnboardingItem {
 
 const ONBOARDING_ITEMS: OnboardingItem[] = [
   {
-    title: "Reclaim your scroll time",
-    text: "Set a daily scroll budget across all your apps and stick to it without deleting any apps.",
-    icon: "time-outline",
+    title: "Choose your apps",
+    text: "Select the apps you want to track. They'll all share one daily scroll budget.",
+    icon: "apps-outline",
     color: colors.primary,
-    iconColor: colors.dark,
+    iconColor: colors.icon,
   },
 
   {
-    title: "See where the time goes",
-    text: "Track your screen time across all your selected apps with one shared budget and clear insights.",
-    icon: "bar-chart-outline",
-    color: colors.dark,
+    title: "Set a daily budget",
+    text: "Choose how much time you want to spend each day across your selected apps.",
+    icon: "timer-outline",
+    color: colors.icon,
     iconColor: colors.primary,
   },
 
   {
-    title: "Small habits, big change",
-    text: "You set the budget. We'll help you stay accountable. One day at a time.",
-    icon: "leaf-outline",
+    title: "Track your progress",
+    text: "See where your time goes, get notified as you approach your limit, and build healthier scrolling habits.",
+    icon: "pie-chart-outline",
     color: colors.primaryDark,
-    iconColor: colors.dark,
+    iconColor: colors.icon,
   },
 ];
 
@@ -108,7 +108,7 @@ export default Onboarding;
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     justifyContent: "space-around",
     padding: spacing.lg,
   },
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.darkMuted,
-    fontSize: typography.body,
-    fontFamily: fonts.medium,
+    color: colors.text,
+    fontSize: typography.medium,
+    fontFamily: fonts.semiBold,
     textAlign: "center",
   },
 });
