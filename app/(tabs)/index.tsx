@@ -1,37 +1,38 @@
 import AppUsageCard from "@/components/AppUsageCard";
+import ErrorModal from "@/components/ErrorModal";
 import PermissionModal from "@/components/PermissionModal";
 import UsagePreview from "@/components/UsagePreview";
-import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
 import { TrackedAppUsageStat } from "@/types/App";
+import { AppError } from "@/types/AppError";
 import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
 import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
-    getHourlyUsage,
-    hasUsagePermission,
-    openUsagePermissionSettings,
+  getHourlyUsage,
+  hasUsagePermission,
+  openUsagePermissionSettings,
 } from "@sahil_sensei/react-native-app-usage";
 import { Link } from "expo-router";
 import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    ActivityIndicator,
-    AppState,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  AppState,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -42,8 +43,7 @@ const Dashboard = () => {
   const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([]);
   const [showPermissionModal, setShowPermissionModal] = useState(true);
   const [loadingUsage, setLoadingUsage] = useState(false);
-  const [error, setError] = useState("");
-  const [showError, setShowError] = useState(false);
+  const [error, setError] = useState<AppError | null>(null);
   const wentToSettings = useRef(false);
 
   const isInitialLoad = usageStats.length === 0;
@@ -82,11 +82,14 @@ const Dashboard = () => {
       setLoadingUsage(false);
     } catch (error) {
       console.error("Dashboard load error:", error);
-      setError("Something went wrong. Try again.");
-      setShowError(true);
+      setError({
+        visible: true,
+        title: "Couldn't load dashboard",
+        message: "We couldn't load your dashboard right now. Please try again",
+      });
       setLoadingUsage(false);
     }
-  }, [myTrackedApps, setUsageStats, setLoadingUsage, setError, setShowError]);
+  }, [myTrackedApps, setUsageStats, setLoadingUsage, setError]);
 
   // check app state
   useEffect(() => {
@@ -219,11 +222,10 @@ const Dashboard = () => {
         onDismiss={handlePermissionModalDismiss}
       />
       <ErrorModal
-        modalVisible={showError}
-        onCloseModal={() => setShowError(false)}
-        onRetry={loadDashboard}
-        error={error}
-        title="Couldn't load your usage data"
+        visible={error?.visible ?? false}
+        onClose={() => setError(null)}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
       />
     </SafeAreaView>
   );

@@ -2,7 +2,8 @@ import { App } from "@/types/App";
 import { getData, saveData } from "../storage";
 import { TRACKED_APPS_KEY } from "./localStorage";
 
-export const setTrackedApps = (apps: App[]) => saveData(TRACKED_APPS_KEY, apps);
+export const setTrackedApps = async (apps: App[]) =>
+  await saveData(TRACKED_APPS_KEY, apps);
 
 export const getTrackedApps = async (): Promise<App[]> => {
   const apps = await getData<App[]>(TRACKED_APPS_KEY);

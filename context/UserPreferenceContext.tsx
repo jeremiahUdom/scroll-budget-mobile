@@ -62,7 +62,6 @@ export const UserPreferenceProvider = ({ children }: Props) => {
     try {
       setMyTrackedApps(apps);
       await setTrackedApps(apps.map((app) => app));
-
       return;
     } catch (error) {
       console.error("Failed to update tracked apps", error);
@@ -120,10 +119,11 @@ export const UserPreferenceProvider = ({ children }: Props) => {
         const trackedApps = await getTrackedApps();
         setMyTrackedApps(trackedApps);
 
+        setIsInitialising(false);
+
         return;
       } catch (error) {
         console.error("App initialisation failed", error);
-      } finally {
         setIsInitialising(false);
       }
     };

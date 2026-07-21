@@ -2,6 +2,7 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
+import { AppError } from "@/types/AppError";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import {
@@ -13,14 +14,11 @@ import {
   View,
 } from "react-native";
 
-interface Props {
-  visible: boolean;
+interface Props extends AppError {
   onClose: () => void;
-  title: string;
-  message: string;
 }
 
-const ValidationModal = ({
+const ValidationErrorModal = ({
   visible = false,
   onClose,
   message,
@@ -56,7 +54,7 @@ const ValidationModal = ({
   );
 };
 
-export default ValidationModal;
+export default ValidationErrorModal;
 
 const styles = StyleSheet.create({
   modalView: {

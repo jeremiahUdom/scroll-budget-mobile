@@ -1,11 +1,12 @@
 import AppButton from "@/components/AppButton";
+import ErrorModal from "@/components/ErrorModal";
 import GoBackBtn from "@/components/GoBackBtn";
-import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
+import { AppError } from "@/types/AppError";
 import { minutesToMilliseconds } from "@/utils/formatMinutesToTime";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
@@ -45,12 +46,9 @@ const SetCustomTime = () => {
   const router = useRouter();
   const { updateScrollBudget } = useUserPreference();
   const [loading, setLoading] = useState(false);
-  const [updateError, setUpdateError] = useState("");
-  const [showUpdateError, setShowUpdateError] = useState(false);
   const [hours, setHours] = useState("0");
   const [minutes, setMinutes] = useState("0");
-  const [inputError, setInputError] = useState("");
-  const [showInputError, setShowInputError] = useState(false);
+  const [error, setError] = useState<AppError | null>(null);
 
   const increaseHourCounter = () => {
     const userInput = parseInt(hours);
@@ -58,9 +56,11 @@ const SetCustomTime = () => {
     const validation = hoursSchema.safeParse({ hours: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -73,9 +73,11 @@ const SetCustomTime = () => {
     const validation = hoursSchema.safeParse({ hours: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -87,9 +89,11 @@ const SetCustomTime = () => {
     const validation = minutesSchema.safeParse({ minutes: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -102,9 +106,11 @@ const SetCustomTime = () => {
     const validation = minutesSchema.safeParse({ minutes: userInput });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -122,9 +128,11 @@ const SetCustomTime = () => {
     const validation = hoursSchema.safeParse({ hours: parsed });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -142,9 +150,11 @@ const SetCustomTime = () => {
     const validation = minutesSchema.safeParse({ minutes: parsed });
 
     if (!validation.success) {
-      const error = validation.error.issues[0].message;
-      setInputError(error);
-      setShowInputError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message: validation.error.issues[0].message,
+      });
       return;
     }
 
@@ -169,10 +179,12 @@ const SetCustomTime = () => {
       });
 
       if (!validation.success) {
-        setUpdateError(
-          "Budget must be atleast 1 minute and must not exceed 24hrs",
-        );
-        setShowUpdateError(true);
+        setError({
+          visible: true,
+          title: "Invalid budget",
+          message: "Budget must be atleast 1 minute and must not exceed 24hrs",
+        });
+        setLoading(false);
         return;
       }
 
@@ -189,10 +201,12 @@ const SetCustomTime = () => {
         "An error occured while saving your daily budget. Please try again",
         error,
       );
-      setUpdateError(
-        "An error occured while saving your daily budget. Please try again",
-      );
-      setShowUpdateError(true);
+      setError({
+        visible: true,
+        title: "Couldn't save your selection",
+        message:
+          "An error occurred while saving your budget. Please try again.",
+      });
       setLoading(false);
       return;
     }
@@ -269,18 +283,10 @@ const SetCustomTime = () => {
       </AppButton>
 
       <ErrorModal
-        modalVisible={showUpdateError}
-        onCloseModal={() => {
-          setShowUpdateError(false);
-          setUpdateError("");
-        }}
-        error={updateError}
-      />
-
-      <ErrorModal
-        modalVisible={showInputError}
-        onCloseModal={() => setShowInputError(false)}
-        error={inputError}
+        visible={error?.visible ?? false}
+        onClose={() => setError(null)}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
       />
     </SafeAreaView>
   );

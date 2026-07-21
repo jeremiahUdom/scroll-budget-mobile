@@ -1,12 +1,13 @@
 import AppButton from "@/components/AppButton";
 import AppItem from "@/components/AppItem";
-import ErrorModal from "@/components/ValidationError";
+import ErrorModal from "@/components/ErrorModal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
 import { App } from "@/types/App";
+import { AppError } from "@/types/AppError";
 import { getInstalledApps } from "@sahil_sensei/react-native-app-usage";
 import { Link, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -27,9 +28,7 @@ const SelectApps = () => {
   const [apps, setApps] = useState<App[]>([]);
   const [isFetchingUserInstalledApps, setisFetchingUserInstalledApps] =
     useState(false);
-  const [error, setError] = useState({
-    
-  })
+  const [error, setError] = useState<AppError | null>(null);
 
   const selectedSet = useMemo(
     () => new Set(selectedApps.map((app) => app.packageName)),
@@ -91,10 +90,11 @@ const SelectApps = () => {
 
   const handleContinue = async () => {
     if (selectedApps.length === 0) {
-      // No apps selected
-      // setErrorTitle("No apps selected");
-      // setValidationError("Choose at least one app to continue.");
-      // setShowValidatiError(true);
+      setError({
+        visible: true,
+        title: "No apps selected",
+        message: "Choose at least one app to continue.",
+      });
       return;
     }
 
@@ -102,24 +102,21 @@ const SelectApps = () => {
     try {
       // update tracked apps in the context
       await updateTrackedApps(selectedApps);
-
       router.replace("/SetDailyBudget");
-
       setLoading(false);
-
       return;
     } catch (error) {
       console.error(
         "An error occured while trying to save your selected apps.",
         error,
       );
-      // Save failed
-      // setErrorTitle("Couldn't save your selection");
-      // setError(
-      //   "An error occurred while saving your selected apps. Please try again.",
-      // );
-      // setShowError(true);
-      // setLoading(false);
+      setError({
+        visible: true,
+        title: "Couldn't save your selection",
+        message:
+          "An error occurred while saving your selected apps. Please try again.",
+      });
+      setLoading(false);
       return;
     }
   };
@@ -178,11 +175,10 @@ const SelectApps = () => {
       </AppButton>
 
       <ErrorModal
-        modalVisible={showError}
-        title={errorTitle}
-        onCloseModal={() => setShowError(false)}
-        error={error}
-        onRetry={fetchUserInstalledApps}
+        visible={error?.visible ?? false}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
+        onClose={() => setError(null)}
       />
     </SafeAreaView>
   );

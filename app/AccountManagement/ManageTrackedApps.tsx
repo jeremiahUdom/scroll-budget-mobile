@@ -1,34 +1,34 @@
 import AppButton from "@/components/AppButton";
 import AppItem from "@/components/AppItem";
+import ErrorModal from "@/components/ErrorModal";
 import GoBackBtn from "@/components/GoBackBtn";
-import ErrorModal from "@/components/ValidationError";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
 import { App } from "@/types/App";
+import { AppError } from "@/types/AppError";
 import { getInstalledApps } from "@sahil_sensei/react-native-app-usage";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const SelectApps = () => {
   const router = useRouter();
   const { myTrackedApps, updateTrackedApps } = useUserPreference();
-  const [error, setError] = useState("");
-  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedApps, setSelectedApps] = useState<App[]>([]);
   const [apps, setApps] = useState<App[]>([]);
   const [initialising, setInitialising] = useState(true);
+  const [error, setError] = useState<AppError | null>(null);
 
   const selectedSet = useMemo(
     () => new Set(selectedApps.map((app) => app.packageName)),
@@ -65,22 +65,23 @@ const SelectApps = () => {
         try {
           // get all the installed apps on the user's phone
           const installedApps = await getInstalledApps();
-
           const apps: App[] = installedApps.map((app) => ({
             name: app.name,
             packageName: app.packageName,
             icon: app.icon,
           }));
-
           setApps(apps);
-
           setSelectedApps(myTrackedApps);
-
           setInitialising(false);
-
           return;
         } catch (error) {
           console.error("Error loading screen", error);
+          setError({
+            visible: true,
+            title: "Couldn't load your apps",
+            message:
+              "We couldn't load the apps installed on your device. Please try again.",
+          });
           setInitialising(false);
           return;
         }
@@ -92,8 +93,11 @@ const SelectApps = () => {
 
   const handleContine = async () => {
     if (selectedApps.length === 0) {
-      setError("You have not chosen any app.");
-      setShowError(true);
+      setError({
+        visible: true,
+        title: "No apps selected",
+        message: "Choose at least one app to continue.",
+      });
       return;
     }
 
@@ -112,10 +116,12 @@ const SelectApps = () => {
         "An error occured while trying to save your selected apps.",
         error,
       );
-      setError(
-        "An error occured while trying to save your selected apps. Please try again",
-      );
-      setShowError(true);
+      setError({
+        visible: true,
+        title: "Couldn't save your selection",
+        message:
+          "An error occurred while saving your selected apps. Please try again.",
+      });
       setLoading(false);
       return;
     }
@@ -169,9 +175,10 @@ const SelectApps = () => {
       </AppButton>
 
       <ErrorModal
-        modalVisible={showError}
-        onCloseModal={() => setShowError(false)}
-        error={error}
+        visible={error?.visible ?? false}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
+        onClose={() => setError(null)}
       />
     </SafeAreaView>
   );

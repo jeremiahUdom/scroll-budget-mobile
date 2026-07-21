@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
 
   skipText: {
-    color: colors.text,
+    color: colors.textSecondary,
     fontSize: typography.medium,
     fontFamily: fonts.semiBold,
     textAlign: "center",

@@ -1,10 +1,11 @@
 import AppButton from "@/components/AppButton";
-import ErrorModal from "@/components/ValidationError";
+import ErrorModal from "@/components/ErrorModal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
+import { AppError } from "@/types/AppError";
 import { minutesToMilliseconds } from "@/utils/formatMinutesToTime";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { Link, useRouter } from "expo-router";
@@ -60,9 +61,8 @@ const SetDailyBudget = () => {
   const router = useRouter();
   const { updateScrollBudget } = useUserPreference();
   const [loading, setLoading] = useState(false);
-  const [updateError, setUpdateError] = useState("");
-  const [showUpdateError, setShowUpdateError] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
 
   const handleSelected = (item: Item) => {
     if (item.id === "0") {
@@ -76,6 +76,11 @@ const SetDailyBudget = () => {
 
   const handleContinue = async () => {
     if (!selectedItem) {
+      setError({
+        visible: true,
+        title: "No budget selected",
+        message: "Please choose a daily scroll budget before continuing.",
+      });
       return;
     }
 
@@ -94,10 +99,12 @@ const SetDailyBudget = () => {
       return;
     } catch (error) {
       console.error("An error occured while saving your daily budget", error);
-      setUpdateError(
-        "An error occured while saving your daily budget. Please try again",
-      );
-      setShowUpdateError(true);
+      setError({
+        visible: true,
+        title: "Couldn't save your selection",
+        message:
+          "An error occurred while saving your budget. Please try again.",
+      });
       setLoading(false);
       return;
     }
@@ -153,9 +160,10 @@ const SetDailyBudget = () => {
       </AppButton>
 
       <ErrorModal
-        modalVisible={showUpdateError}
-        onCloseModal={() => setShowUpdateError(false)}
-        error={updateError}
+        visible={error?.visible ?? false}
+        onClose={() => setError(null)}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
       />
     </SafeAreaView>
   );

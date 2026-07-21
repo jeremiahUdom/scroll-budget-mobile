@@ -4,7 +4,7 @@ import { Redirect } from "expo-router";
 const App = () => {
   const { hasOnboarded } = useUserPreference();
 
-  if (hasOnboarded) return <Redirect href={"/(onboarding)/SelectApps"} />;
+  if (hasOnboarded) return <Redirect href={"/(tabs)"} />;
 
   return <Redirect href={"/(onboarding)/Onboarding"} />;
 };

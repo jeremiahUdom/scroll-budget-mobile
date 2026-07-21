@@ -1,9 +1,10 @@
 import AppButton from "@/components/AppButton";
-import ErrorModal from "@/components/ValidationError";
+import ErrorModal from "@/components/ErrorModal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
+import { AppError } from "@/types/AppError";
 import { requestNotificationsPermission } from "@/utils/notificationService";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
@@ -13,8 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const GetNotified = () => {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [showError, setShowError] = useState(false);
+  const [error, setError] = useState<AppError | null>(null);
 
   const enableNotification = async () => {
     try {
@@ -23,10 +23,12 @@ const GetNotified = () => {
       return;
     } catch (error) {
       console.error("could not enable notifications", error);
-      setError(
-        "An error occured while enabling notifications. lease try again or skip this step and enble it later from app settings.",
-      );
-      setShowError(true);
+      setError({
+        visible: true,
+        title: "Invalid budget",
+        message:
+          "An error occurred while enabling notifications. Try again, or skip this step and enable notifications later from the app settings.",
+      });
       return;
     }
   };
@@ -82,13 +84,10 @@ const GetNotified = () => {
       </View>
 
       <ErrorModal
-        modalVisible={showError}
-        error={error}
-        onCloseModal={() => {
-          setShowError(false);
-          setError("");
-          router.push("/(tabs)");
-        }}
+        visible={error?.visible ?? false}
+        onClose={() => setError(null)}
+        title={error?.title ?? ""}
+        message={error?.message ?? ""}
       />
     </SafeAreaView>
   );

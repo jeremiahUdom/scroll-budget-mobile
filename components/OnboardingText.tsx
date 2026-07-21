@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: typography.body,
     lineHeight: 24,
-    color: colors.textSecondary,
+    color: colors.text,
     position: "absolute",
     fontFamily: fonts.regular,
   },
