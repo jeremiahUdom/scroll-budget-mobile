@@ -11,10 +11,8 @@ import {
   getTrackedApps,
   setTrackedApps,
 } from "@/utils/localDataManager/trackedAppsStorage";
-import {
-  getUsageStatsPermission,
-  setUsageStatsPermission,
-} from "@/utils/localDataManager/usageStatStorage";
+import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
+import { hasUsagePermission } from "@sahil_sensei/react-native-app-usage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type UserPreferenceContextType = {
@@ -108,7 +106,7 @@ export const UserPreferenceProvider = ({ children }: Props) => {
         }
         setHasOnboarded(true);
 
-        const usageStatPermission = await getUsageStatsPermission();
+        const usageStatPermission = await hasUsagePermission();
         setHasPermissionToViewUsageStats(usageStatPermission);
 
         // get users budget from async storage

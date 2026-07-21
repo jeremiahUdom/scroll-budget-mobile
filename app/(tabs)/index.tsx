@@ -10,7 +10,6 @@ import { useUserPreference } from "@/context/UserPreferenceContext";
 import { TrackedAppUsageStat } from "@/types/App";
 import { AppError } from "@/types/AppError";
 import { formatDurationFromMilliseconds } from "@/utils/formatMinutesToTime";
-import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   getHourlyUsage,
@@ -18,13 +17,7 @@ import {
   openUsagePermissionSettings,
 } from "@sahil_sensei/react-native-app-usage";
 import { Link } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   AppState,
@@ -38,20 +31,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Dashboard = () => {
   const today = new Date();
-  const { scrollBudgetInMs, myTrackedApps, hasPermissionToViewUsageStats } =
-    useUserPreference();
+  const {
+    scrollBudgetInMs,
+    myTrackedApps,
+    hasPermissionToViewUsageStats,
+    updateUsageStatsPermission,
+  } = useUserPreference();
   const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([]);
-  const [showPermissionModal, setShowPermissionModal] = useState(true);
   const [loadingUsage, setLoadingUsage] = useState(false);
   const [error, setError] = useState<AppError | null>(null);
-  const wentToSettings = useRef(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(true);
 
   const isInitialLoad = usageStats.length === 0;
 
   const checkPermission = useCallback(async () => {
     const permission = await hasUsagePermission();
-    setUsageStatsPermission(permission);
-  }, []);
+    updateUsageStatsPermission(permission);
+  }, [updateUsageStatsPermission]);
 
   const loadDashboard = useCallback(async () => {
     if (myTrackedApps.length === 0) {
@@ -91,28 +87,24 @@ const Dashboard = () => {
     }
   }, [myTrackedApps, setUsageStats, setLoadingUsage, setError]);
 
+  useEffect(() => {
+    setShowPermissionModal(true);
+    if (hasPermissionToViewUsageStats) {
+      setShowPermissionModal(false);
+      void loadDashboard();
+      return;
+    }
+  }, [hasPermissionToViewUsageStats, loadDashboard]);
+
   // check app state
   useEffect(() => {
     const subscription = AppState.addEventListener("change", async (state) => {
-      if (state === "active" && wentToSettings.current) {
-        wentToSettings.current = false;
+      if (state === "active") {
         await checkPermission();
       }
     });
 
     return () => subscription.remove();
-  }, [checkPermission]);
-
-  useEffect(() => {
-    if (hasPermissionToViewUsageStats) {
-      void loadDashboard();
-      setShowPermissionModal(false);
-      return;
-    }
-  }, [hasPermissionToViewUsageStats, loadDashboard]);
-
-  useEffect(() => {
-    checkPermission();
   }, [checkPermission]);
 
   // Calculate total usage in milliseconds for all tracked apps
@@ -121,17 +113,7 @@ const Dashboard = () => {
     [usageStats],
   );
 
-  const handlePermissionModalDismiss = () => {
-    setShowPermissionModal(false);
-  };
-
-  const handleOpenSettings = () => {
-    wentToSettings.current = true;
-    setShowPermissionModal(false);
-  };
-
   const handleEnablePress = () => {
-    wentToSettings.current = true;
     openUsagePermissionSettings();
   };
 
@@ -156,7 +138,7 @@ const Dashboard = () => {
           <View style={styles.bannerText}>
             <Text style={styles.bannerTitle}>Enable Usage Access</Text>
             <Text style={styles.bannerSubtitle}>
-              Grant permission to see your stats
+              Enable usage access to see current statistics.
             </Text>
           </View>
           <Pressable style={styles.enableButton} onPress={handleEnablePress}>
@@ -218,9 +200,9 @@ const Dashboard = () => {
 
       <PermissionModal
         visible={showPermissionModal}
-        onOpenSettings={handleOpenSettings}
-        onDismiss={handlePermissionModalDismiss}
+        onDismiss={() => setShowPermissionModal(false)}
       />
+
       <ErrorModal
         visible={error?.visible ?? false}
         onClose={() => setError(null)}

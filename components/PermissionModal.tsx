@@ -8,17 +8,11 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface PermissionModalProps {
   visible: boolean;
-  onOpenSettings: () => void;
   onDismiss: () => void;
 }
 
-const PermissionModal = ({
-  visible,
-  onOpenSettings,
-  onDismiss,
-}: PermissionModalProps) => {
+const PermissionModal = ({ visible, onDismiss }: PermissionModalProps) => {
   const handleOpenSettings = async () => {
-    onOpenSettings();
     await openUsagePermissionSettings();
   };
 
@@ -29,14 +23,10 @@ const PermissionModal = ({
       animationType="fade"
       onRequestClose={onDismiss}
     >
-      {/* Dark overlay */}
       <View style={styles.overlay}>
-        {/* Pressable overlay to dismiss */}
         <Pressable style={styles.overlayPress} onPress={onDismiss} />
 
-        {/* Modal card */}
         <View style={styles.modal}>
-          {/* Lock icon */}
           <View style={styles.iconContainer}>
             <Ionicons
               name="lock-closed-outline"
@@ -45,18 +35,14 @@ const PermissionModal = ({
             />
           </View>
 
-          {/* Title */}
           <Text style={styles.title}>Enable Usage Access</Text>
 
-          {/* Subtitle */}
           <Text style={styles.subtitle}>
             Grant permission to see your app usage stats and stay within your
             daily budget.
           </Text>
 
-          {/* Buttons container */}
           <View style={styles.buttonsContainer}>
-            {/* Open Settings button */}
             <Pressable
               style={({ pressed }) => [
                 styles.button,
@@ -67,7 +53,6 @@ const PermissionModal = ({
               <Text style={styles.primaryButtonText}>Open Settings</Text>
             </Pressable>
 
-            {/* Maybe Later button */}
             <Pressable
               style={({ pressed }) => [pressed && styles.buttonPressed]}
               onPress={onDismiss}

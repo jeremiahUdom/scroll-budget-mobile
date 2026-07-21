@@ -4,7 +4,6 @@ import { fonts } from "@/constants/fonts";
 import { spacing } from "@/constants/spacing";
 import { typography } from "@/constants/typography";
 import { useUserPreference } from "@/context/UserPreferenceContext";
-import { setUsageStatsPermission } from "@/utils/localDataManager/usageStatStorage";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
   hasUsagePermission,
@@ -25,7 +24,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Permissions = () => {
   const router = useRouter();
   const wentToSettings = useRef(false);
-  const { updateHasOnboarded } = useUserPreference();
+  const { updateHasOnboarded, updateUsageStatsPermission } =
+    useUserPreference();
 
   const grantAccess = async () => {
     wentToSettings.current = true;
@@ -47,16 +47,16 @@ const Permissions = () => {
       if (state === "active" && wentToSettings.current) {
         wentToSettings.current = false;
         const permission = await hasUsagePermission();
+        await updateUsageStatsPermission(permission);
         if (permission) {
           await updateHasOnboarded(true);
           router.replace("/SelectApps");
         }
-        await setUsageStatsPermission(permission);
       }
     });
 
     return () => subscription.remove();
-  }, [router, updateHasOnboarded]);
+  }, [router, updateUsageStatsPermission, updateHasOnboarded]);
 
   return (
     <SafeAreaView style={styles.main}>
