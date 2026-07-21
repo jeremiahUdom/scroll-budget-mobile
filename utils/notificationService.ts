@@ -1,4 +1,4 @@
-import * as Notifications from "expo-notifications"
+import * as Notifications from "expo-notifications";
 
 export const initialiseNotifications = async () => {
   await Notifications.setNotificationChannelAsync("scroll-budget-alerts", {
@@ -6,28 +6,28 @@ export const initialiseNotifications = async () => {
     importance: Notifications.AndroidImportance.HIGH,
     sound: "default",
     vibrationPattern: [0, 250, 250, 250],
-  })
-}
+  });
+};
 
 export const requestNotificationsPermission = async () => {
-  const settings = await Notifications.getPermissionsAsync()
+  const settings = await Notifications.getPermissionsAsync();
 
   if (settings.status === "granted") {
-    return true
+    return true;
   }
 
-  const permission = await Notifications.requestPermissionsAsync()
+  const permission = await Notifications.requestPermissionsAsync();
 
-  return permission.status === "granted"
-}
+  return permission.status === "granted";
+};
 
 export const notifyBudgetThreshold = async (title: string, body: string) => {
   await Notifications.scheduleNotificationAsync({
     content: {
       title,
       body,
-      sound: "default"
+      sound: "default",
     },
     trigger: null,
-  })
-}
+  });
+};
