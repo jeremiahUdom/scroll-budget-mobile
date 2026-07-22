@@ -16,7 +16,7 @@ import {
   hasUsagePermission,
   openUsagePermissionSettings,
 } from "@sahil_sensei/react-native-app-usage";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -40,7 +40,7 @@ const Dashboard = () => {
   const [usageStats, setUsageStats] = useState<TrackedAppUsageStat[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(false);
   const [error, setError] = useState<AppError | null>(null);
-  const [showPermissionModal, setShowPermissionModal] = useState(true);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const isInitialLoad = usageStats.length === 0;
 
@@ -87,14 +87,16 @@ const Dashboard = () => {
     }
   }, [myTrackedApps, setUsageStats, setLoadingUsage, setError]);
 
-  useEffect(() => {
-    setShowPermissionModal(true);
-    if (hasPermissionToViewUsageStats) {
-      setShowPermissionModal(false);
-      void loadDashboard();
-      return;
-    }
-  }, [hasPermissionToViewUsageStats, loadDashboard]);
+  useFocusEffect(
+    useCallback(() => {
+      if (hasPermissionToViewUsageStats) {
+        setShowPermissionModal(false);
+        void loadDashboard();
+        return;
+      }
+      setShowPermissionModal(true);
+    }, [hasPermissionToViewUsageStats, loadDashboard, setShowPermissionModal]),
+  );
 
   // check app state
   useEffect(() => {
