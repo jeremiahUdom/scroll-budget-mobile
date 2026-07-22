@@ -218,10 +218,12 @@ const SetCustomTime = () => {
         <GoBackBtn onButtonPressed={() => router.replace("/SetDailyBudget")} />
       </View>
       <View style={styles.form}>
-        <Text style={styles.heading}>Set your daily limit</Text>
+        <Text style={styles.heading}>
+          How much time do you want to spend on the apps you selected each day?
+        </Text>
         <Text style={styles.supportingText}>
-          This will be your shared daily budget across all apps. Budgets can
-          only change once a day.
+          This will be your shared daily budget across all the apps you
+          selected. You can change your budget once per day.
         </Text>
 
         <View style={styles.inputs}>
